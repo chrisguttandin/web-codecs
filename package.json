@@ -9,7 +9,7 @@
         }
     },
     "dependencies": {
-        "@babel/runtime": "^7.24.0",
+        "@babel/runtime": "^7.24.1",
         "tslib": "^2.6.2"
     },
     "description": "A (not yet) extendable and (not yet) complete drop-in replacement for the native WebCodecs API.",
