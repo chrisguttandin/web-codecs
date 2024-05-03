@@ -1,4 +1,6 @@
 import { AudioData } from '../../src/module';
+import { deinterleave } from '../helpers/deinterleave';
+import { extractPlanes } from '../helpers/extract-planes';
 
 describe('AudioData', () => {
     describe('constructor()', () => {
@@ -257,69 +259,60 @@ describe('AudioData', () => {
                         expect(audioData.allocationSize({ planeIndex: 0 })).to.equal(10);
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 })).to.equal(5);
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 1 })).to.equal(5);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not ompute the allocationSize for copying the data as s16', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16', () => {
                         try {
-                            audioData.allocationSize({ format: 's16', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16', planeIndex: 0 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's16-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 0 })).to.equal(10);
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 1 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32', () => {
                         try {
-                            audioData.allocationSize({ format: 's32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's32-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 0 })).to.equal(20);
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 1 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as f32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as f32', () => {
                         try {
-                            audioData.allocationSize({ format: 'f32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'f32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -343,14 +336,12 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8', planeIndex: 0 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -364,58 +355,50 @@ describe('AudioData', () => {
                         expect(audioData.allocationSize({ planeIndex: 1 })).to.equal(5);
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16', () => {
                         try {
-                            audioData.allocationSize({ format: 's16', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16', planeIndex: 0 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's16-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 0 })).to.equal(10);
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 1 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32', () => {
                         try {
-                            audioData.allocationSize({ format: 's32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's32-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 0 })).to.equal(20);
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 1 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as f32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as f32', () => {
                         try {
-                            audioData.allocationSize({ format: 'f32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'f32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -447,25 +430,22 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8', planeIndex: 0 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 })).to.equal(5);
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 1 })).to.equal(5);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -477,47 +457,41 @@ describe('AudioData', () => {
                         expect(audioData.allocationSize({ planeIndex: 0 })).to.equal(20);
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's16-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 0 })).to.equal(10);
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 1 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32', () => {
                         try {
-                            audioData.allocationSize({ format: 's32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's32-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 0 })).to.equal(20);
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 1 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as f32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as f32', () => {
                         try {
-                            audioData.allocationSize({ format: 'f32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'f32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -541,36 +515,31 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8', planeIndex: 0 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 })).to.equal(5);
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 1 })).to.equal(5);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16', () => {
                         try {
-                            audioData.allocationSize({ format: 's16', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16', planeIndex: 0 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -584,36 +553,31 @@ describe('AudioData', () => {
                         expect(audioData.allocationSize({ planeIndex: 1 })).to.equal(10);
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32', () => {
                         try {
-                            audioData.allocationSize({ format: 's32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's32-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 0 })).to.equal(20);
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 1 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as f32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as f32', () => {
                         try {
-                            audioData.allocationSize({ format: 'f32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'f32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -645,47 +609,41 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8', planeIndex: 0 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 })).to.equal(5);
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 1 })).to.equal(5);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16', () => {
                         try {
-                            audioData.allocationSize({ format: 's16', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16', planeIndex: 0 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's16-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 0 })).to.equal(10);
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 1 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -697,25 +655,22 @@ describe('AudioData', () => {
                         expect(audioData.allocationSize({ planeIndex: 0 })).to.equal(40);
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's32-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 0 })).to.equal(20);
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 1 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as f32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as f32', () => {
                         try {
-                            audioData.allocationSize({ format: 'f32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'f32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -739,58 +694,50 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8', planeIndex: 0 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 })).to.equal(5);
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 1 })).to.equal(5);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16', () => {
                         try {
-                            audioData.allocationSize({ format: 's16', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16', planeIndex: 0 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's16-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 0 })).to.equal(10);
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 1 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32', () => {
                         try {
-                            audioData.allocationSize({ format: 's32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -804,14 +751,12 @@ describe('AudioData', () => {
                         expect(audioData.allocationSize({ planeIndex: 1 })).to.equal(20);
                     });
 
-                    it('should not compute the allocationSize for copying the data as f32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as f32', () => {
                         try {
-                            audioData.allocationSize({ format: 'f32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'f32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -843,69 +788,60 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8', planeIndex: 0 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 })).to.equal(5);
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 1 })).to.equal(5);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16', () => {
                         try {
-                            audioData.allocationSize({ format: 's16', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16', planeIndex: 0 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's16-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 0 })).to.equal(10);
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 1 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32', () => {
                         try {
-                            audioData.allocationSize({ format: 's32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's32-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 0 })).to.equal(20);
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 1 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -937,80 +873,69 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8', planeIndex: 0 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as u8-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as u8-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 0 })).to.equal(5);
+                            expect(audioData.allocationSize({ format: 'u8-planar', planeIndex: 1 })).to.equal(5);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16', () => {
                         try {
-                            audioData.allocationSize({ format: 's16', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16', planeIndex: 0 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s16-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s16-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's16-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 0 })).to.equal(10);
+                            expect(audioData.allocationSize({ format: 's16-planar', planeIndex: 1 })).to.equal(10);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32', () => {
                         try {
-                            audioData.allocationSize({ format: 's32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as s32-planar', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as s32-planar', () => {
                         try {
-                            audioData.allocationSize({ format: 's32-planar', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 0 })).to.equal(20);
+                            expect(audioData.allocationSize({ format: 's32-planar', planeIndex: 1 })).to.equal(20);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not compute the allocationSize for copying the data as f32', (done) => {
+                    it('should possibly compute the allocationSize for copying the data as f32', () => {
                         try {
-                            audioData.allocationSize({ format: 'f32', planeIndex: 0 });
+                            expect(audioData.allocationSize({ format: 'f32', planeIndex: 0 })).to.equal(40);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1235,42 +1160,35 @@ describe('AudioData', () => {
         });
 
         describe('with AudioData that is not yet closed', () => {
-            let testVectorInterleavedPlanes;
-            let testVectorPlanarPlanes;
-
-            beforeEach(() => {
-                testVectorInterleavedPlanes = [
-                    [-1, 1, 0.5, 0, 0],
-                    [0, -1, -0.5, 1, 0]
-                ];
-                testVectorPlanarPlanes = [
-                    [-1, 0, 1, -1, 0.5],
-                    [-0.5, 0, 1, 0, 0]
-                ];
-            });
-
             describe('int8', () => {
-                let data;
-                let epsilon;
+                let f32InterleavedData;
+                let f32Planes;
+                let u8InterleavedData;
+                let u8Planes;
+                let s16InterleavedData;
+                let s16Planes;
+                let s32InterleavedData;
+                let s32Planes;
 
                 beforeEach(() => {
-                    const INT8_MAX = 0x7f;
-                    const INT8_MIN = -INT8_MAX - 1;
-                    const UINT8_MAX = 0xff;
-
-                    data = new Uint8Array([
-                        0,
-                        -INT8_MIN,
-                        UINT8_MAX,
-                        0,
-                        INT8_MAX / 2 + 128,
-                        INT8_MIN / 2 + 128,
-                        -INT8_MIN,
-                        UINT8_MAX,
-                        -INT8_MIN,
-                        -INT8_MIN
-                    ]);
-                    epsilon = 1 / (UINT8_MAX - 1);
+                    u8InterleavedData = new Uint8Array(Array.from({ length: 10 }, () => Math.floor(Math.random() * 256)));
+                    f32InterleavedData = new Float32Array(
+                        Array.from(u8InterleavedData).map((value) => (value - 128) * Math.fround(1 / (value < 128 ? 128 : 127)))
+                    );
+                    f32Planes = extractPlanes(f32InterleavedData);
+                    s16InterleavedData = new Int16Array(
+                        Array.from(u8InterleavedData).map((value) =>
+                            value < 128 ? (value - 128) * 256 : Math.fround(Math.fround((value - 128) / 127) * 32767)
+                        )
+                    );
+                    s16Planes = extractPlanes(s16InterleavedData);
+                    s32InterleavedData = new Int32Array(
+                        Array.from(u8InterleavedData).map((value) =>
+                            Math.min(2147483647, Math.fround((value - 128) * (value < 128 ? 16777216 : Math.fround(2147483647 / 127))))
+                        )
+                    );
+                    s32Planes = extractPlanes(s32InterleavedData);
+                    u8Planes = extractPlanes(u8InterleavedData);
                 });
 
                 describe('with u8 data', () => {
@@ -1278,7 +1196,7 @@ describe('AudioData', () => {
 
                     beforeEach(() => {
                         audioData = new AudioData({
-                            data,
+                            data: u8InterleavedData,
                             format: 'u8',
                             numberOfChannels,
                             numberOfFrames,
@@ -1292,7 +1210,7 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data));
+                        expect(destination).to.deep.equal(u8InterleavedData);
                     });
 
                     it('should copy the data as u8 (without specifying it)', () => {
@@ -1300,7 +1218,7 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data));
+                        expect(destination).to.deep.equal(u8InterleavedData);
                     });
 
                     it('should not copy the data as u8 if the destination is too small', () => {
@@ -1309,81 +1227,93 @@ describe('AudioData', () => {
                         expect(() => audioData.copyTo(destination, { planeIndex: 0 })).to.throw(RangeError);
                     });
 
-                    it('should not copy the data as u8-planar', (done) => {
+                    it('should possibly copy the data as u8-planar', () => {
                         const destination = new Uint8Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8Planes[0]);
+
+                            audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(u8Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16', (done) => {
+                    it('should possibly copy the data as s16', () => {
                         const destination = new Int16Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16-planar', (done) => {
+                    it('should possibly copy the data as s16-planar', () => {
                         const destination = new Int16Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s16Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32', (done) => {
+                    it('should possibly copy the data as s32', () => {
                         const destination = new Int32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32-planar', (done) => {
+                    it('should possibly copy the data as s32-planar', () => {
                         const destination = new Int32Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s32Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as f32', (done) => {
+                    it('should possibly copy the data as f32', () => {
                         const destination = new Float32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(f32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1392,15 +1322,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        for (let i = 0; i < numberOfFrames; i += 1) {
-                            expect(destination[i]).to.be.closeTo(testVectorInterleavedPlanes[0][i], epsilon);
-                        }
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        for (let i = 0; i < numberOfFrames; i += 1) {
-                            expect(destination[i]).to.be.closeTo(testVectorInterleavedPlanes[1][i], epsilon);
-                        }
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
                 });
 
@@ -1409,7 +1335,7 @@ describe('AudioData', () => {
 
                     beforeEach(() => {
                         audioData = new AudioData({
-                            data,
+                            data: new Uint8Array(deinterleave(u8InterleavedData)),
                             format: 'u8-planar',
                             numberOfChannels,
                             numberOfFrames,
@@ -1418,16 +1344,16 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not copy the data as u8', (done) => {
+                    it('should possibly copy the data as u8', () => {
                         const destination = new Uint8Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1436,11 +1362,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(0, numberOfFrames));
+                        expect(destination).to.deep.equal(u8Planes[0]);
 
                         audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(numberOfFrames));
+                        expect(destination).to.deep.equal(u8Planes[1]);
                     });
 
                     it('should copy the data as u8-planar (without specifying it)', () => {
@@ -1448,11 +1374,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(0, numberOfFrames));
+                        expect(destination).to.deep.equal(u8Planes[0]);
 
                         audioData.copyTo(destination, { planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(numberOfFrames));
+                        expect(destination).to.deep.equal(u8Planes[1]);
                     });
 
                     it('should not copy the data as u8-planar if the destination is too small', () => {
@@ -1462,68 +1388,76 @@ describe('AudioData', () => {
                         expect(() => audioData.copyTo(destination, { planeIndex: 1 })).to.throw(RangeError);
                     });
 
-                    it('should not copy the data as s16', (done) => {
+                    it('should possibly copy the data as s16', () => {
                         const destination = new Int16Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16-planar', (done) => {
+                    it('should possibly copy the data as s16-planar', () => {
                         const destination = new Int16Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s16Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32', (done) => {
+                    it('should possibly copy the data as s32', () => {
                         const destination = new Int32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32-planar', (done) => {
+                    it('should possibly copy the data as s32-planar', () => {
                         const destination = new Int32Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s32Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as f32', (done) => {
+                    it('should possibly copy the data as f32', () => {
                         const destination = new Float32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(f32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1532,29 +1466,40 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        for (let i = 0; i < numberOfFrames; i += 1) {
-                            expect(destination[i]).to.be.closeTo(testVectorPlanarPlanes[0][i], epsilon);
-                        }
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        for (let i = 0; i < numberOfFrames; i += 1) {
-                            expect(destination[i]).to.be.closeTo(testVectorPlanarPlanes[1][i], epsilon);
-                        }
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
                 });
             });
 
             describe('int16', () => {
-                let data;
-                let epsilon;
+                let f32InterleavedData;
+                let f32Planes;
+                let u8InterleavedData;
+                let u8Planes;
+                let s16InterleavedData;
+                let s16Planes;
+                let s32InterleavedData;
+                let s32Planes;
 
                 beforeEach(() => {
-                    const INT16_MAX = 0x7fff;
-                    const INT16_MIN = -INT16_MAX - 1;
-
-                    data = new Int16Array([INT16_MIN, 0, INT16_MAX, INT16_MIN, INT16_MAX / 2, INT16_MIN / 2, 0, INT16_MAX, 0, 0]);
-                    epsilon = 1 / (INT16_MAX + 1);
+                    s16InterleavedData = new Int16Array(Array.from({ length: 10 }, () => Math.floor(Math.random() * 65536) - 32768));
+                    f32InterleavedData = new Float32Array(
+                        Array.from(s16InterleavedData).map((value) => value * Math.fround(1 / (value < 0 ? 32768 : 32767)))
+                    );
+                    f32Planes = extractPlanes(f32InterleavedData);
+                    s16Planes = extractPlanes(s16InterleavedData);
+                    s32InterleavedData = new Int32Array(
+                        Array.from(s16InterleavedData).map((value) => Math.fround(value * (value < 0 ? 65536 : 65538)))
+                    );
+                    s32Planes = extractPlanes(s32InterleavedData);
+                    u8InterleavedData = new Uint8Array(
+                        Array.from(s16InterleavedData).map((value) => 128 + value / (value < 0 ? 32768 / 128 : 32767 / 127))
+                    );
+                    u8Planes = extractPlanes(u8InterleavedData);
                 });
 
                 describe('with s16 data', () => {
@@ -1562,7 +1507,7 @@ describe('AudioData', () => {
 
                     beforeEach(() => {
                         audioData = new AudioData({
-                            data,
+                            data: s16InterleavedData,
                             format: 's16',
                             numberOfChannels,
                             numberOfFrames,
@@ -1571,29 +1516,33 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not copy the data as u8', (done) => {
+                    it('should possibly copy the data as u8', () => {
                         const destination = new Uint8Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as u8-planar', (done) => {
+                    it('should possibly copy the data as u8-planar', () => {
                         const destination = new Uint8Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8Planes[0]);
+
+                            audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(u8Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1602,7 +1551,7 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data));
+                        expect(destination).to.deep.equal(s16InterleavedData);
                     });
 
                     it('should copy the data as s16 (without specifying it)', () => {
@@ -1610,7 +1559,7 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data));
+                        expect(destination).to.deep.equal(s16InterleavedData);
                     });
 
                     it('should not copy the data as s16 if the destination is too small', () => {
@@ -1619,55 +1568,63 @@ describe('AudioData', () => {
                         expect(() => audioData.copyTo(destination, { planeIndex: 0 })).to.throw(RangeError);
                     });
 
-                    it('should not copy the data as s16-planar', (done) => {
+                    it('should possibly copy the data as s16-planar', () => {
                         const destination = new Int16Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s16Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32', (done) => {
+                    it('should possibly copy the data as s32', () => {
                         const destination = new Int32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32-planar', (done) => {
+                    it('should possibly copy the data as s32-planar', () => {
                         const destination = new Int32Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s32Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as f32', (done) => {
+                    it('should possibly copy the data as f32', () => {
                         const destination = new Float32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(f32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1676,15 +1633,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        for (let i = 0; i < numberOfFrames; i += 1) {
-                            expect(destination[i]).to.be.closeTo(testVectorInterleavedPlanes[0][i], epsilon);
-                        }
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        for (let i = 0; i < numberOfFrames; i += 1) {
-                            expect(destination[i]).to.be.closeTo(testVectorInterleavedPlanes[1][i], epsilon);
-                        }
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
                 });
 
@@ -1693,7 +1646,7 @@ describe('AudioData', () => {
 
                     beforeEach(() => {
                         audioData = new AudioData({
-                            data,
+                            data: new Int16Array(deinterleave(s16InterleavedData)),
                             format: 's16-planar',
                             numberOfChannels,
                             numberOfFrames,
@@ -1702,42 +1655,46 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not copy the data as u8', (done) => {
+                    it('should possibly copy the data as u8', () => {
                         const destination = new Uint8Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as u8-planar', (done) => {
+                    it('should possibly copy the data as u8-planar', () => {
                         const destination = new Uint8Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8Planes[0]);
+
+                            audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(u8Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16', (done) => {
+                    it('should possibly copy the data as s16', () => {
                         const destination = new Int16Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1746,11 +1703,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(0, numberOfFrames));
+                        expect(destination).to.deep.equal(s16Planes[0]);
 
                         audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(numberOfFrames));
+                        expect(destination).to.deep.equal(s16Planes[1]);
                     });
 
                     it('should copy the data as s16-planar (without specifying it)', () => {
@@ -1758,11 +1715,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(0, numberOfFrames));
+                        expect(destination).to.deep.equal(s16Planes[0]);
 
                         audioData.copyTo(destination, { planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(numberOfFrames));
+                        expect(destination).to.deep.equal(s16Planes[1]);
                     });
 
                     it('should not copy the data as s16-planar if the destination is too small', () => {
@@ -1772,42 +1729,46 @@ describe('AudioData', () => {
                         expect(() => audioData.copyTo(destination, { planeIndex: 1 })).to.throw(RangeError);
                     });
 
-                    it('should not copy the data as s32', (done) => {
+                    it('should possibly copy the data as s32', () => {
                         const destination = new Int32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32-planar', (done) => {
+                    it('should possibly copy the data as s32-planar', () => {
                         const destination = new Int32Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s32Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as f32', (done) => {
+                    it('should possibly copy the data as f32', () => {
                         const destination = new Float32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(f32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1816,27 +1777,42 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        for (let i = 0; i < numberOfFrames; i += 1) {
-                            expect(destination[i]).to.be.closeTo(testVectorPlanarPlanes[0][i], epsilon);
-                        }
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        for (let i = 0; i < numberOfFrames; i += 1) {
-                            expect(destination[i]).to.be.closeTo(testVectorPlanarPlanes[1][i], epsilon);
-                        }
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
                 });
             });
 
             describe('int32', () => {
-                let data;
+                let f32InterleavedData;
+                let f32Planes;
+                let u8InterleavedData;
+                let u8Planes;
+                let s16InterleavedData;
+                let s16Planes;
+                let s32InterleavedData;
+                let s32Planes;
 
                 beforeEach(() => {
-                    const INT32_MAX = 0x7fffffff;
-                    const INT32_MIN = -INT32_MAX - 1;
-
-                    data = new Int32Array([INT32_MIN, 0, INT32_MAX, INT32_MIN, INT32_MAX / 2, INT32_MIN / 2, 0, INT32_MAX, 0, 0]);
+                    s32InterleavedData = new Int32Array(
+                        Array.from({ length: 10 }, () => Math.floor(Math.random() * 4294967296) - 2147483648)
+                    );
+                    f32InterleavedData = new Float32Array(
+                        Array.from(s32InterleavedData).map((value) => value * Math.fround(1 / (value < 0 ? 2147483648 : 2147483647)))
+                    );
+                    f32Planes = extractPlanes(f32InterleavedData);
+                    s16InterleavedData = new Int16Array(
+                        Array.from(s32InterleavedData).map((value) => value / (value < 0 ? 65536 : 2147483647 / 32767))
+                    );
+                    s16Planes = extractPlanes(s16InterleavedData);
+                    s32Planes = extractPlanes(s32InterleavedData);
+                    u8InterleavedData = new Uint8Array(
+                        Array.from(s32InterleavedData).map((value) => 128 + value / (value < 0 ? 2147483648 / 128 : 2147483647 / 127))
+                    );
+                    u8Planes = extractPlanes(u8InterleavedData);
                 });
 
                 describe('with s32 data', () => {
@@ -1844,7 +1820,7 @@ describe('AudioData', () => {
 
                     beforeEach(() => {
                         audioData = new AudioData({
-                            data,
+                            data: s32InterleavedData,
                             format: 's32',
                             numberOfChannels,
                             numberOfFrames,
@@ -1853,55 +1829,63 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not copy the data as u8', (done) => {
+                    it('should possibly copy the data as u8', () => {
                         const destination = new Uint8Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as u8-planar', (done) => {
+                    it('should possibly copy the data as u8-planar', () => {
                         const destination = new Uint8Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8Planes[0]);
+
+                            audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(u8Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16', (done) => {
+                    it('should possibly copy the data as s16', () => {
                         const destination = new Int16Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16-planar', (done) => {
+                    it('should possibly copy the data as s16-planar', () => {
                         const destination = new Int16Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s16Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1910,7 +1894,7 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data));
+                        expect(destination).to.deep.equal(s32InterleavedData);
                     });
 
                     it('should copy the data as s32 (without specifying it)', () => {
@@ -1918,7 +1902,7 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data));
+                        expect(destination).to.deep.equal(s32InterleavedData);
                     });
 
                     it('should not copy the data as s32 if the destination is too small', () => {
@@ -1927,29 +1911,33 @@ describe('AudioData', () => {
                         expect(() => audioData.copyTo(destination, { planeIndex: 0 })).to.throw(RangeError);
                     });
 
-                    it('should not copy the data as s32-planar', (done) => {
+                    it('should possibly copy the data as s32-planar', () => {
                         const destination = new Int32Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s32Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as f32', (done) => {
+                    it('should possibly copy the data as f32', () => {
                         const destination = new Float32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(f32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -1958,11 +1946,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorInterleavedPlanes[0]));
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorInterleavedPlanes[1]));
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
                 });
 
@@ -1971,7 +1959,7 @@ describe('AudioData', () => {
 
                     beforeEach(() => {
                         audioData = new AudioData({
-                            data,
+                            data: new Int32Array(deinterleave(s32InterleavedData)),
                             format: 's32-planar',
                             numberOfChannels,
                             numberOfFrames,
@@ -1980,68 +1968,76 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not copy the data as u8', (done) => {
+                    it('should possibly copy the data as u8', () => {
                         const destination = new Uint8Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as u8-planar', (done) => {
+                    it('should possibly copy the data as u8-planar', () => {
                         const destination = new Uint8Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8Planes[0]);
+
+                            audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(u8Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16', (done) => {
+                    it('should possibly copy the data as s16', () => {
                         const destination = new Int16Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16-planar', (done) => {
+                    it('should possibly copy the data as s16-planar', () => {
                         const destination = new Int16Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s16Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32', (done) => {
+                    it('should possibly copy the data as s32', () => {
                         const destination = new Int32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -2050,11 +2046,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(0, numberOfFrames));
+                        expect(destination).to.deep.equal(s32Planes[0]);
 
                         audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(numberOfFrames));
+                        expect(destination).to.deep.equal(s32Planes[1]);
                     });
 
                     it('should copy the data as s32-planar (without specifying it)', () => {
@@ -2062,11 +2058,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(0, numberOfFrames));
+                        expect(destination).to.deep.equal(s32Planes[0]);
 
                         audioData.copyTo(destination, { planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data).slice(numberOfFrames));
+                        expect(destination).to.deep.equal(s32Planes[1]);
                     });
 
                     it('should not copy the data as s32-planar if the destination is too small', () => {
@@ -2076,16 +2072,16 @@ describe('AudioData', () => {
                         expect(() => audioData.copyTo(destination, { planeIndex: 1 })).to.throw(RangeError);
                     });
 
-                    it('should not copy the data as f32', (done) => {
+                    it('should possibly copy the data as f32', () => {
                         const destination = new Float32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(f32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -2094,20 +2090,40 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorPlanarPlanes[0]));
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorPlanarPlanes[1]));
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
                 });
             });
 
             describe('float32', () => {
-                let data;
+                let f32InterleavedData;
+                let f32Planes;
+                let u8InterleavedData;
+                let u8Planes;
+                let s16InterleavedData;
+                let s16Planes;
+                let s32InterleavedData;
+                let s32Planes;
 
                 beforeEach(() => {
-                    data = new Float32Array([-1, 0, 1, -1, 0.5, -0.5, 0, 1, 0, 0]);
+                    f32InterleavedData = new Float32Array(Array.from({ length: 10 }, () => Math.random() * 2 - 1));
+                    f32Planes = extractPlanes(f32InterleavedData);
+                    s16InterleavedData = new Int16Array(
+                        Array.from(f32InterleavedData).map((value) => Math.fround(value * (value < 0 ? 32768 : 32767)))
+                    );
+                    s16Planes = extractPlanes(s16InterleavedData);
+                    s32InterleavedData = new Int32Array(
+                        Array.from(f32InterleavedData).map((value) => Math.fround(value * (value < 0 ? 2147483648 : 2147483647)))
+                    );
+                    s32Planes = extractPlanes(s32InterleavedData);
+                    u8InterleavedData = new Uint8Array(
+                        Array.from(f32InterleavedData).map((value) => 128 + value * (value < 0 ? 128 : 127))
+                    );
+                    u8Planes = extractPlanes(u8InterleavedData);
                 });
 
                 describe('with f32 data', () => {
@@ -2115,7 +2131,7 @@ describe('AudioData', () => {
 
                     beforeEach(() => {
                         audioData = new AudioData({
-                            data,
+                            data: f32InterleavedData,
                             format: 'f32',
                             numberOfChannels,
                             numberOfFrames,
@@ -2124,81 +2140,93 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not copy the data as u8', (done) => {
+                    it('should possibly copy the data as u8', () => {
                         const destination = new Uint8Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as u8-planar', (done) => {
+                    it('should possibly copy the data as u8-planar', () => {
                         const destination = new Uint8Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8Planes[0]);
+
+                            audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(u8Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16', (done) => {
+                    it('should possibly copy the data as s16', () => {
                         const destination = new Int16Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16-planar', (done) => {
+                    it('should possibly copy the data as s16-planar', () => {
                         const destination = new Int16Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s16Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32', (done) => {
+                    it('should possibly copy the data as s32', () => {
                         const destination = new Int32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32-planar', (done) => {
+                    it('should possibly copy the data as s32-planar', () => {
                         const destination = new Int32Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s32Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -2207,7 +2235,7 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data));
+                        expect(destination).to.deep.equal(f32InterleavedData);
                     });
 
                     it('should copy the data as f32 (without specifying it)', () => {
@@ -2215,7 +2243,7 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(data));
+                        expect(destination).to.deep.equal(f32InterleavedData);
                     });
 
                     it('should not copy the data as f32 if the destination is too small', () => {
@@ -2229,11 +2257,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorInterleavedPlanes[0]));
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorInterleavedPlanes[1]));
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
                 });
 
@@ -2242,7 +2270,7 @@ describe('AudioData', () => {
 
                     beforeEach(() => {
                         audioData = new AudioData({
-                            data,
+                            data: new Float32Array(deinterleave(f32InterleavedData)),
                             format: 'f32-planar',
                             numberOfChannels,
                             numberOfFrames,
@@ -2251,94 +2279,106 @@ describe('AudioData', () => {
                         });
                     });
 
-                    it('should not copy the data as u8', (done) => {
+                    it('should possibly copy the data as u8', () => {
                         const destination = new Uint8Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as u8-planar', (done) => {
+                    it('should possibly copy the data as u8-planar', () => {
                         const destination = new Uint8Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(u8Planes[0]);
+
+                            audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(u8Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16', (done) => {
+                    it('should possibly copy the data as s16', () => {
                         const destination = new Int16Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s16-planar', (done) => {
+                    it('should possibly copy the data as s16-planar', () => {
                         const destination = new Int16Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s16Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s16Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32', (done) => {
+                    it('should possibly copy the data as s32', () => {
                         const destination = new Int32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as s32-planar', (done) => {
+                    it('should possibly copy the data as s32-planar', () => {
                         const destination = new Int32Array(numberOfFrames);
 
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(s32Planes[0]);
+
+                            audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
+
+                            expect(destination).to.deep.equal(s32Planes[1]);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
-                    it('should not copy the data as f32', (done) => {
+                    it('should possibly copy the data as f32', () => {
                         const destination = new Float32Array(numberOfFrames * numberOfChannels);
 
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
+
+                            expect(destination).to.deep.equal(f32InterleavedData);
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
-
-                            done();
                         }
                     });
 
@@ -2347,11 +2387,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorPlanarPlanes[0]));
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorPlanarPlanes[1]));
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
 
                     it('should copy the data as f32-planar (without specifying it)', () => {
@@ -2359,11 +2399,11 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { planeIndex: 0 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorPlanarPlanes[0]));
+                        expect(destination).to.deep.equal(f32Planes[0]);
 
                         audioData.copyTo(destination, { planeIndex: 1 });
 
-                        expect(Array.from(destination)).to.deep.equal(Array.from(testVectorPlanarPlanes[1]));
+                        expect(destination).to.deep.equal(f32Planes[1]);
                     });
 
                     it('should not copy the data as f32-planar if the destination is too small', () => {
