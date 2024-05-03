@@ -1034,7 +1034,7 @@ describe('AudioData', () => {
                     audioData.copyTo(audioDataDestination, { planeIndex });
                     clonedAudioData.copyTo(cloneAudioDataDestination, { planeIndex });
 
-                    expect(Array.from(audioDataDestination)).to.deep.equal(Array.from(cloneAudioDataDestination));
+                    expect(audioDataDestination).to.deep.equal(cloneAudioDataDestination);
                 }
             });
 
