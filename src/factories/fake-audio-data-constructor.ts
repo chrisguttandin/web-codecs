@@ -252,7 +252,7 @@ export const createFakeAudioDataConstructor = (
                     for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += this.#numberOfChannels) {
                         const value = dataAsUint8Array[sourceIndex];
 
-                        destinationAsFloat32Array[i] = (value - 128) / (value < 128 ? 128 : 127);
+                        destinationAsFloat32Array[i] = (value - 128) * Math.fround(1 / (value < 128 ? 128 : 127));
                     }
                 } else if (this.#format === 'u8-planar') {
                     const dataAsUint8Array = convertBufferSourceToTypedArray(this.#data, Uint8Array);
@@ -260,7 +260,7 @@ export const createFakeAudioDataConstructor = (
                     for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
                         const value = dataAsUint8Array[sourceIndex];
 
-                        destinationAsFloat32Array[i] = (value - 128) / (value < 128 ? 128 : 127);
+                        destinationAsFloat32Array[i] = (value - 128) * Math.fround(1 / (value < 128 ? 128 : 127));
                     }
                 } else if (this.#format === 's16') {
                     const dataAsInt16Array = convertBufferSourceToTypedArray(this.#data, Int16Array);
@@ -268,7 +268,7 @@ export const createFakeAudioDataConstructor = (
                     for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += this.#numberOfChannels) {
                         const value = dataAsInt16Array[sourceIndex];
 
-                        destinationAsFloat32Array[i] = value < 0 ? value / 32768 : value / 32767;
+                        destinationAsFloat32Array[i] = value * Math.fround(1 / (value < 0 ? 32768 : 32767));
                     }
                 } else if (this.#format === 's16-planar') {
                     const dataAsInt16Array = convertBufferSourceToTypedArray(this.#data, Int16Array);
@@ -276,7 +276,7 @@ export const createFakeAudioDataConstructor = (
                     for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
                         const value = dataAsInt16Array[sourceIndex];
 
-                        destinationAsFloat32Array[i] = value < 0 ? value / 32768 : value / 32767;
+                        destinationAsFloat32Array[i] = value * Math.fround(1 / (value < 0 ? 32768 : 32767));
                     }
                 } else if (this.#format === 's32') {
                     const dataAsInt32Array = convertBufferSourceToTypedArray(this.#data, Int32Array);
@@ -284,7 +284,7 @@ export const createFakeAudioDataConstructor = (
                     for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += this.#numberOfChannels) {
                         const value = dataAsInt32Array[sourceIndex];
 
-                        destinationAsFloat32Array[i] = value < 0 ? value / 2147483648 : value / 2147483647;
+                        destinationAsFloat32Array[i] = value * Math.fround(1 / (value < 0 ? 2147483648 : 2147483647));
                     }
                 } else if (this.#format === 's32-planar') {
                     const dataAsInt32Array = convertBufferSourceToTypedArray(this.#data, Int32Array);
@@ -292,7 +292,7 @@ export const createFakeAudioDataConstructor = (
                     for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
                         const value = dataAsInt32Array[sourceIndex];
 
-                        destinationAsFloat32Array[i] = value < 0 ? value / 2147483648 : value / 2147483647;
+                        destinationAsFloat32Array[i] = value * Math.fround(1 / (value < 0 ? 2147483648 : 2147483647));
                     }
                 } else if (this.#format === 'f32') {
                     const dataAsFloat32Array = convertBufferSourceToTypedArray(this.#data, Float32Array);
