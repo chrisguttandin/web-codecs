@@ -13,6 +13,7 @@ export const createEncodedAudioChunkConstructor = (
         #internalEncodedAudioChunk: INativeEncodedAudioChunk;
 
         constructor(init: INativeEncodedAudioChunkInit) {
+            // Bug #4: EncodedAudioChunk is not yet implemented in Firefox and Safari.
             this.#internalEncodedAudioChunk =
                 nativeEncodedAudioChunkConstructor === null
                     ? new fakeEncodedAudioChunkConstructor(init)
