@@ -20,7 +20,7 @@ export const createFakeEncodedAudioChunkConstructor = (
 
         constructor(init: INativeEncodedAudioChunkInit) {
             if (init.data === undefined || init.timestamp === undefined || init.type === undefined) {
-                throw new TypeError("Failed to construct 'AudioData'.");
+                throw new TypeError("Failed to construct 'EncodedAudioChunk'.");
             }
 
             if (init.transfer !== undefined) {
