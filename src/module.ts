@@ -32,7 +32,7 @@ export { audioDataConstructor as AudioData };
 const isKnownAudioCodec = createIsKnownAudioCodec(KNOWN_AUDIO_CODECS);
 const fakeAudioDecoderConstructor = createFakeAudioDecoderConstructor(isKnownAudioCodec);
 const nativeAudioDecoderConstructor = createNativeAudioDecoderConstructor(window);
-export const nativeEncodedAudioChunks = new WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>();
+const nativeEncodedAudioChunks = new WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>();
 const audioDecoderConstructor = createAudioDecoderConstructor(
     fakeAudioDecoderConstructor,
     nativeAudioDecoderConstructor,
