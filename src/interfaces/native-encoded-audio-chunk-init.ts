@@ -7,5 +7,7 @@ export interface INativeEncodedAudioChunkInit {
 
     timestamp: number;
 
+    transfer?: ArrayBuffer[];
+
     type: TNativeEncodedAudioChunkType;
 }

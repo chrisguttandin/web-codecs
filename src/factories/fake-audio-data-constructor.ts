@@ -51,6 +51,19 @@ export const createFakeAudioDataConstructor = (
                 throw new TypeError("Failed to construct 'AudioData'.");
             }
 
+            if (init.transfer !== undefined) {
+                if (init.transfer.length !== new Set(init.transfer).size) {
+                    throw new DOMException("Failed to construct 'AudioData'.", 'DataCloneError');
+                }
+
+                for (const arrayBuffer of init.transfer) {
+                    const { port1 } = new MessageChannel();
+
+                    port1.postMessage(arrayBuffer, [arrayBuffer]);
+                    port1.close();
+                }
+            }
+
             this.#data = init.data;
             this.#duration = (init.numberOfFrames / init.sampleRate) * 1000000;
             this.#format = init.format;

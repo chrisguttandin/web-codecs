@@ -36,6 +36,15 @@ export const createAudioDataConstructor = (
                         throw new TypeError("Failed to construct 'AudioData'.");
                     }
 
+                    // Bug #3: Chrome does not throw a DataCloneError when provided with a detached ArrayBuffer.
+                    if (
+                        err instanceof TypeError &&
+                        initOrSymbol.transfer !== undefined &&
+                        initOrSymbol.transfer.some((arrayBuffer) => arrayBuffer.byteLength === 0)
+                    ) {
+                        throw new DOMException("Failed to construct 'AudioData'.", 'DataCloneError');
+                    }
+
                     throw err;
                 }
             }

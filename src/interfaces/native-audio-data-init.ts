@@ -12,4 +12,6 @@ export interface INativeAudioDataInit {
     sampleRate: number;
 
     timestamp: number;
+
+    transfer?: ArrayBuffer[];
 }

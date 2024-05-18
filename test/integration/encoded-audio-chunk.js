@@ -47,6 +47,17 @@ describe('EncodedAudioChunk', () => {
                 expect(encodedAudioChunk.timestamp).to.equal(timestamp);
                 expect(encodedAudioChunk.type).to.equal(type);
             });
+
+            it('should detach a transferred ArrayBuffer', () => {
+                new EncodedAudioChunk({
+                    data,
+                    timestamp,
+                    transfer: [data.buffer],
+                    type
+                });
+
+                expect(data.buffer.byteLength).to.equal(0);
+            });
         });
 
         describe('with invalid options', () => {
@@ -60,6 +71,51 @@ describe('EncodedAudioChunk', () => {
                                 type
                             })
                     ).to.throw(TypeError);
+                });
+            });
+
+            describe('with two references to the same ArrayBuffer', () => {
+                it('should throw a DataCloneError', (done) => {
+                    try {
+                        new EncodedAudioChunk({
+                            data,
+                            duration,
+                            timestamp,
+                            transfer: [data.buffer, data.buffer],
+                            type
+                        });
+                    } catch (err) {
+                        expect(err.code).to.equal(25);
+                        expect(err.name).to.equal('DataCloneError');
+
+                        done();
+                    }
+                });
+            });
+
+            describe('with a reference to a detached ArrayBuffer', () => {
+                beforeEach(() => {
+                    const { port1 } = new MessageChannel();
+
+                    port1.postMessage(data, [data.buffer]);
+                    port1.close();
+                });
+
+                it('should throw a DataCloneError', (done) => {
+                    try {
+                        new EncodedAudioChunk({
+                            data,
+                            duration,
+                            timestamp,
+                            transfer: [data.buffer],
+                            type
+                        });
+                    } catch (err) {
+                        expect(err.code).to.equal(25);
+                        expect(err.name).to.equal('DataCloneError');
+
+                        done();
+                    }
                 });
             });
 
