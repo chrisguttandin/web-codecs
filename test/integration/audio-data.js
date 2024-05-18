@@ -121,6 +121,22 @@ describe('AudioData', () => {
                 });
             });
 
+            describe('with a numberOfChannels of zero', () => {
+                it('should throw a TypeError', () => {
+                    expect(
+                        () =>
+                            new AudioData({
+                                data,
+                                format,
+                                numberOfChannels: 0,
+                                numberOfFrames,
+                                sampleRate,
+                                timestamp
+                            })
+                    ).to.throw(TypeError);
+                });
+            });
+
             describe('with a numberOfChannels below zero', () => {
                 it('should throw a TypeError', () => {
                     expect(
@@ -145,6 +161,22 @@ describe('AudioData', () => {
                                 data,
                                 format,
                                 numberOfChannels,
+                                sampleRate,
+                                timestamp
+                            })
+                    ).to.throw(TypeError);
+                });
+            });
+
+            describe('with a numberOfFrames of zero', () => {
+                it('should throw a TypeError', () => {
+                    expect(
+                        () =>
+                            new AudioData({
+                                data,
+                                format,
+                                numberOfChannels,
+                                numberOfFrames: 0,
                                 sampleRate,
                                 timestamp
                             })
