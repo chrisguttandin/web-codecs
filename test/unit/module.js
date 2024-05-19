@@ -1,4 +1,4 @@
-import { AudioData, AudioDecoder, EncodedAudioChunk } from '../../src/module';
+import { AudioData, AudioDecoder, AudioEncoder, EncodedAudioChunk } from '../../src/module';
 
 describe('module', () => {
     it('should export the AudioData constructor', () => {
@@ -7,6 +7,10 @@ describe('module', () => {
 
     it('should export the AudioDecoder constructor', () => {
         expect(AudioDecoder).to.be.a('function');
+    });
+
+    it('should export the AudioEncoder constructor', () => {
+        expect(AudioEncoder).to.be.a('function');
     });
 
     it('should export the EncodedAudioChunk constructor', () => {

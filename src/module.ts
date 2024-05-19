@@ -1,13 +1,16 @@
 import { KNOWN_AUDIO_CODECS } from './constants/known-audio-codecs';
 import { createAudioDataConstructor } from './factories/audio-data-constructor';
 import { createAudioDecoderConstructor } from './factories/audio-decoder-constructor';
+import { createAudioEncoderConstructor } from './factories/audio-encoder-constructor';
 import { createEncodedAudioChunkConstructor } from './factories/encoded-audio-chunk-constructor';
 import { createFakeAudioDataConstructor } from './factories/fake-audio-data-constructor';
 import { createFakeAudioDecoderConstructor } from './factories/fake-audio-decoder-constructor';
+import { createFakeAudioEncoderConstructor } from './factories/fake-audio-encoder-constructor';
 import { createFakeEncodedAudioChunkConstructor } from './factories/fake-encoded-audio-chunk-constructor';
 import { createIsKnownAudioCodec } from './factories/is-known-codec';
 import { createNativeAudioDataConstructor } from './factories/native-audio-data-constructor';
 import { createNativeAudioDecoderConstructor } from './factories/native-audio-decoder-constructor';
+import { createNativeAudioEncoderConstructor } from './factories/native-audio-encoder-constructor';
 import { createNativeEncodedAudioChunkConstructor } from './factories/native-encoded-audio-chunk-constructor';
 import { createWindow } from './factories/window';
 import { computeCopyElementCount } from './functions/compute-copy-element-count';
@@ -40,6 +43,12 @@ const audioDecoderConstructor = createAudioDecoderConstructor(
 );
 
 export { audioDecoderConstructor as AudioDecoder };
+
+const fakeAudioEncoderConstructor = createFakeAudioEncoderConstructor(isKnownAudioCodec);
+const nativeAudioEncoderConstructor = createNativeAudioEncoderConstructor(window);
+const audioEncoderConstructor = createAudioEncoderConstructor(fakeAudioEncoderConstructor, nativeAudioDatas, nativeAudioEncoderConstructor);
+
+export { audioEncoderConstructor as AudioEncoder };
 
 const fakeEncodedAudioChunkConstructor = createFakeEncodedAudioChunkConstructor(convertBufferSourceToTypedArray);
 const nativeEncodedAudioChunkConstructor = createNativeEncodedAudioChunkConstructor(window);
