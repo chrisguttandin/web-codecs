@@ -1,6 +1,7 @@
 import { AudioDecoder, EncodedAudioChunk } from '../../src/module';
 import { spy, stub } from 'sinon';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
+import { filterSupportedAudioCodecsForDecoding } from '../helpers/filter-supported-audio-codecs-for-decoding';
 
 describe('AudioDecoder', () => {
     let error;
@@ -81,16 +82,23 @@ describe('AudioDecoder', () => {
                         error.resetBehavior();
                     });
 
-                    it('should return an AudioDecoderSupport object', async () => {
-                        config.some = 'other property';
+                    describe('with a valid AudioDecoderConfig', () => {
+                        let supported;
 
-                        const audioDecoderSupport = await AudioDecoder.isConfigSupported(config);
+                        beforeEach(() => {
+                            supported = filterSupportedAudioCodecsForDecoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec);
+                        });
 
-                        delete config.some;
+                        it('should return an AudioDecoderSupport object', async () => {
+                            config.some = 'other property';
 
-                        expect(audioDecoderSupport.config).to.not.equal(config);
-                        expect(audioDecoderSupport.supported).to.be.a('boolean');
-                        expect(audioDecoderSupport).to.deep.equal({ config, supported: audioDecoderSupport.supported });
+                            const audioDecoderSupport = await AudioDecoder.isConfigSupported(config);
+
+                            delete config.some;
+
+                            expect(audioDecoderSupport.config).to.not.equal(config);
+                            expect(audioDecoderSupport).to.deep.equal({ config, supported });
+                        });
                     });
                 });
             }
@@ -352,11 +360,6 @@ describe('AudioDecoder', () => {
                 for (const codec of KNOWN_AUDIO_CODECS.filter((knownAudioCodec) => !['flac', 'vorbis'].includes(knownAudioCodec))) {
                     describe(`with "${codec}"`, () => {
                         let config;
-                        let isConfigSupported;
-
-                        before(() => {
-                            isConfigSupported = true;
-                        });
 
                         beforeEach(() => {
                             config = {
@@ -368,19 +371,39 @@ describe('AudioDecoder', () => {
                             error.resetBehavior();
                         });
 
-                        it('should trigger a NotSupportedError if not supported', async () => {
-                            audioDecoder.configure(config);
+                        if (filterSupportedAudioCodecsForDecoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
+                            it('should not trigger a NotSupportedError', async () => {
+                                audioDecoder.configure(config);
 
-                            expect(error).to.have.not.been.called;
+                                expect(error).to.have.not.been.called;
 
-                            await new Promise((resolve) => {
-                                setTimeout(resolve);
+                                await new Promise((resolve) => {
+                                    setTimeout(resolve);
+                                });
+
+                                expect(error).to.have.not.been.called;
                             });
 
-                            try {
+                            it('should change the state', async () => {
+                                audioDecoder.configure(config);
+
+                                expect(audioDecoder.state).to.equal('configured');
+
+                                await new Promise((resolve) => {
+                                    setTimeout(resolve);
+                                });
+
+                                expect(audioDecoder.state).to.equal('configured');
+                            });
+                        } else {
+                            it('should trigger a NotSupportedError', async () => {
+                                audioDecoder.configure(config);
+
                                 expect(error).to.have.not.been.called;
-                            } catch {
-                                isConfigSupported = false;
+
+                                await new Promise((resolve) => {
+                                    setTimeout(resolve);
+                                });
 
                                 expect(error).to.have.been.calledOnce;
 
@@ -389,24 +412,20 @@ describe('AudioDecoder', () => {
                                 expect(args.length).to.equal(1);
                                 expect(args[0].code).to.equal(9);
                                 expect(args[0].name).to.equal('NotSupportedError');
-                            }
-                        });
-
-                        it('should change the state', async () => {
-                            audioDecoder.configure(config);
-
-                            expect(audioDecoder.state).to.equal('configured');
-
-                            await new Promise((resolve) => {
-                                setTimeout(resolve);
                             });
 
-                            if (isConfigSupported) {
+                            it('should change the state', async () => {
+                                audioDecoder.configure(config);
+
                                 expect(audioDecoder.state).to.equal('configured');
-                            } else {
+
+                                await new Promise((resolve) => {
+                                    setTimeout(resolve);
+                                });
+
                                 expect(audioDecoder.state).to.equal('closed');
-                            }
-                        });
+                            });
+                        }
                     });
                 }
             });

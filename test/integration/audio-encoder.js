@@ -1,6 +1,7 @@
 import { AudioData, AudioEncoder } from '../../src/module';
 import { spy, stub } from 'sinon';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
+import { filterSupportedAudioCodecsForEncoding } from '../helpers/filter-supported-audio-codecs-for-encoding';
 
 describe('AudioEncoder', () => {
     let error;
@@ -150,6 +151,12 @@ describe('AudioEncoder', () => {
                     });
 
                     describe('with a valid AudioEncoderConfig', () => {
+                        let supported;
+
+                        beforeEach(() => {
+                            supported = filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec);
+                        });
+
                         it('should return an AudioEncoderSupport object', async () => {
                             config.some = 'other property';
 
@@ -160,8 +167,7 @@ describe('AudioEncoder', () => {
                             config.bitrateMode = 'variable';
 
                             expect(audioEncoderSupport.config).to.not.equal(config);
-                            expect(audioEncoderSupport.supported).to.be.a('boolean');
-                            expect(audioEncoderSupport).to.deep.equal({ config, supported: audioEncoderSupport.supported });
+                            expect(audioEncoderSupport).to.deep.equal({ config, supported });
                         });
                     });
                 });
@@ -554,29 +560,43 @@ describe('AudioEncoder', () => {
                         });
 
                         describe('with a valid AudioEncoderConfig', () => {
-                            let isConfigSupported;
-
-                            before(() => {
-                                isConfigSupported = true;
-                            });
-
                             beforeEach(() => {
                                 error.resetBehavior();
                             });
 
-                            it('should trigger a NotSupportedError if not supported', async () => {
-                                audioEncoder.configure(config);
+                            if (filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
+                                it('should not trigger a NotSupportedError', async () => {
+                                    audioEncoder.configure(config);
 
-                                expect(error).to.have.not.been.called;
+                                    expect(error).to.have.not.been.called;
 
-                                await new Promise((resolve) => {
-                                    setTimeout(resolve);
+                                    await new Promise((resolve) => {
+                                        setTimeout(resolve);
+                                    });
+
+                                    expect(error).to.have.not.been.called;
                                 });
 
-                                try {
+                                it('should change the state', async () => {
+                                    audioEncoder.configure(config);
+
+                                    expect(audioEncoder.state).to.equal('configured');
+
+                                    await new Promise((resolve) => {
+                                        setTimeout(resolve);
+                                    });
+
+                                    expect(audioEncoder.state).to.equal('configured');
+                                });
+                            } else {
+                                it('should trigger a NotSupportedError', async () => {
+                                    audioEncoder.configure(config);
+
                                     expect(error).to.have.not.been.called;
-                                } catch {
-                                    isConfigSupported = false;
+
+                                    await new Promise((resolve) => {
+                                        setTimeout(resolve);
+                                    });
 
                                     expect(error).to.have.been.calledOnce;
 
@@ -585,24 +605,20 @@ describe('AudioEncoder', () => {
                                     expect(args.length).to.equal(1);
                                     expect(args[0].code).to.equal(9);
                                     expect(args[0].name).to.equal('NotSupportedError');
-                                }
-                            });
-
-                            it('should change the state', async () => {
-                                audioEncoder.configure(config);
-
-                                expect(audioEncoder.state).to.equal('configured');
-
-                                await new Promise((resolve) => {
-                                    setTimeout(resolve);
                                 });
 
-                                if (isConfigSupported) {
+                                it('should change the state', async () => {
+                                    audioEncoder.configure(config);
+
                                     expect(audioEncoder.state).to.equal('configured');
-                                } else {
+
+                                    await new Promise((resolve) => {
+                                        setTimeout(resolve);
+                                    });
+
                                     expect(audioEncoder.state).to.equal('closed');
-                                }
-                            });
+                                });
+                            }
                         });
                     });
                 }
