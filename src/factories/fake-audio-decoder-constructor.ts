@@ -68,7 +68,7 @@ export const createFakeAudioDecoderConstructor = (isKnownCodec: ReturnType<typeo
 
         public reset(): void {
             if (this.#state === 'closed') {
-                throw new DOMException("Failed to execute 'flush' on 'AudioDecoder'.", 'InvalidStateError');
+                throw new DOMException("Failed to execute 'reset' on 'AudioDecoder'.", 'InvalidStateError');
             }
         }
 

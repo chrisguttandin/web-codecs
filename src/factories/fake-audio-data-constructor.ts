@@ -99,13 +99,13 @@ export const createFakeAudioDataConstructor = (
 
         public allocationSize(options: INativeAudioDataCopyToOptions): number {
             if (this.#format === null) {
-                throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'InvalidStateError');
+                throw new DOMException("Failed to execute 'allocationSize' on 'AudioData'.", 'InvalidStateError');
             }
 
             const format = options.format ?? this.#format;
 
             if (format !== this.#format && format !== 'f32-planar') {
-                throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'NotSupportedError');
+                throw new DOMException("Failed to execute 'allocationSize' on 'AudioData'.", 'NotSupportedError');
             }
 
             const frameOffset = options.frameOffset ?? 0;
