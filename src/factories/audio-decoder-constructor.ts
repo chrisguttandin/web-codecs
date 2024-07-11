@@ -71,7 +71,7 @@ export const createAudioDecoderConstructor = (
             return this.#internalAudioDecoder.decode(nativeEncodedAudioChunks.get(chunk) ?? chunk);
         }
 
-        public flush(): Promise<undefined> {
+        public flush(): Promise<void> {
             return this.#internalAudioDecoder.flush();
         }
 

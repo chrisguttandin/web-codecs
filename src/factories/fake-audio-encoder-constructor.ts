@@ -62,7 +62,7 @@ export const createFakeAudioEncoderConstructor = (isKnownCodec: ReturnType<typeo
             throw new DOMException("Failed to execute 'encode' on 'AudioEncoder'.", 'InvalidStateError');
         }
 
-        public flush(): Promise<undefined> {
+        public flush(): Promise<void> {
             return Promise.reject(new DOMException("Failed to execute 'flush' on 'AudioEncoder'.", 'InvalidStateError'));
         }
 

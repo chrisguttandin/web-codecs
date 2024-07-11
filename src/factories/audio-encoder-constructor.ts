@@ -76,7 +76,7 @@ export const createAudioEncoderConstructor = (
             return this.#internalAudioEncoder.encode(nativeAudioDatas.get(data) ?? data);
         }
 
-        public flush(): Promise<undefined> {
+        public flush(): Promise<void> {
             return this.#internalAudioEncoder.flush();
         }
 

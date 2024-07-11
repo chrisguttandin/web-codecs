@@ -17,7 +17,7 @@ export interface IAudioDecoder extends IEventTarget<IAudioDecoderEventMap> {
 
     decode(chunk: INativeEncodedAudioChunk): void;
 
-    flush(): Promise<undefined>;
+    flush(): Promise<void>;
 
     reset(): void;
 }

@@ -15,7 +15,7 @@ export interface INativeAudioDecoder extends EventTarget {
 
     decode(chunk: INativeEncodedAudioChunk): void;
 
-    flush(): Promise<undefined>;
+    flush(): Promise<void>;
 
     reset(): void;
 }

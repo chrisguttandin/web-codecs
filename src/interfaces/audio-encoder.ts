@@ -17,7 +17,7 @@ export interface IAudioEncoder extends IEventTarget<IAudioEncoderEventMap> {
 
     encode(data: INativeAudioData): void;
 
-    flush(): Promise<undefined>;
+    flush(): Promise<void>;
 
     reset(): void;
 }

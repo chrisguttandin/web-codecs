@@ -15,7 +15,7 @@ export interface INativeAudioEncoder extends EventTarget {
 
     encode(data: INativeAudioData): void;
 
-    flush(): Promise<undefined>;
+    flush(): Promise<void>;
 
     reset(): void;
 }
