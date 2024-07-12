@@ -247,7 +247,7 @@ export const createFakeAudioDataConstructor = (
             if (format.endsWith('-planar')) {
                 if (this.#format.endsWith('-planar')) {
                     for (
-                        let destinationIndex = 0, sourceIndex = this.numberOfFrames * options.planeIndex;
+                        let destinationIndex = 0, sourceIndex = frameOffset + this.numberOfFrames * options.planeIndex;
                         destinationIndex < elementCount;
                         destinationIndex += 1, sourceIndex += 1
                     ) {
@@ -255,7 +255,7 @@ export const createFakeAudioDataConstructor = (
                     }
                 } else {
                     for (
-                        let destinationIndex = 0, sourceIndex = options.planeIndex;
+                        let destinationIndex = 0, sourceIndex = frameOffset * this.#numberOfChannels + options.planeIndex;
                         destinationIndex < elementCount;
                         destinationIndex += 1, sourceIndex += this.#numberOfChannels
                     ) {
@@ -264,7 +264,7 @@ export const createFakeAudioDataConstructor = (
                 }
             } else if (this.#format.endsWith('-planar')) {
                 for (
-                    let destinationIndex = 0, sourceIndex = 0;
+                    let destinationIndex = 0, sourceIndex = frameOffset;
                     destinationIndex < elementCount;
                     destinationIndex += 1,
                         sourceIndex +=
@@ -275,8 +275,12 @@ export const createFakeAudioDataConstructor = (
                     destinationArray[destinationIndex] = convertValue(sourceArray[sourceIndex]);
                 }
             } else {
-                for (let index = 0; index < elementCount; index += 1) {
-                    destinationArray[index] = convertValue(sourceArray[index]);
+                for (
+                    let destinationIndex = 0, sourceIndex = frameOffset * this.#numberOfChannels;
+                    destinationIndex < elementCount;
+                    destinationIndex += 1, sourceIndex += 1
+                ) {
+                    destinationArray[destinationIndex] = convertValue(sourceArray[sourceIndex]);
                 }
             }
         }
