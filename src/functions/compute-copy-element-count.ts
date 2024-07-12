@@ -9,13 +9,9 @@ export const computeCopyElementCount = (
     planeIndex: number
 ) => {
     const isPlanar = format.endsWith('-planar');
+    const numberOfPlanes = isPlanar ? numberOfChannels : 1;
 
-    if (
-        (planeIndex > 0 && !isPlanar) ||
-        (planeIndex >= numberOfChannels && isPlanar) ||
-        frameOffset >= numberOfFrames ||
-        frameCount > numberOfFrames - frameOffset
-    ) {
+    if (planeIndex >= numberOfPlanes || frameOffset >= numberOfFrames || frameCount > numberOfFrames - frameOffset) {
         throw new RangeError("Failed to execute 'computeCopyElementCount'.");
     }
 
