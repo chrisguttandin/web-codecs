@@ -1,11 +1,35 @@
 import type { computeCopyElementCount as computeCopyElementCountFunction } from '../functions/compute-copy-element-count';
 import type { convertBufferSourceToTypedArray as convertBufferSourceToTypedArrayFunction } from '../functions/convert-buffer-source-to-typed-array';
+import type { convertFloat32ToInt16 as convertFloat32ToInt16Function } from '../functions/convert-float32-to-int16';
+import type { convertFloat32ToInt32 as convertFloat32ToInt32Function } from '../functions/convert-float32-to-int32';
+import type { convertFloat32ToUint8 as convertFloat32ToUint8Function } from '../functions/convert-float32-to-uint8';
+import type { convertInt16ToFloat32 as convertInt16ToFloat32Function } from '../functions/convert-int16-to-float32';
+import type { convertInt16ToInt32 as convertInt16ToInt32Function } from '../functions/convert-int16-to-int32';
+import type { convertInt16ToUint8 as convertInt16ToUint8Function } from '../functions/convert-int16-to-uint8';
+import type { convertInt32ToFloat32 as convertInt32ToFloat32Function } from '../functions/convert-int32-to-float32';
+import type { convertInt32ToInt16 as convertInt32ToInt16Function } from '../functions/convert-int32-to-int16';
+import type { convertInt32ToUint8 as convertInt32ToUint8Function } from '../functions/convert-int32-to-uint8';
+import type { convertUint8ToFloat32 as convertUint8ToFloat32Function } from '../functions/convert-uint8-to-float32';
+import type { convertUint8ToInt16 as convertUint8ToInt16Function } from '../functions/convert-uint8-to-int16';
+import type { convertUint8ToInt32 as convertUint8ToInt32Function } from '../functions/convert-uint8-to-int32';
 import { INativeAudioData, INativeAudioDataCopyToOptions, INativeAudioDataInit } from '../interfaces';
 import { TNativeAudioSampleFormat } from '../types';
 
 export const createFakeAudioDataConstructor = (
     computeCopyElementCount: typeof computeCopyElementCountFunction,
-    convertBufferSourceToTypedArray: typeof convertBufferSourceToTypedArrayFunction
+    convertBufferSourceToTypedArray: typeof convertBufferSourceToTypedArrayFunction,
+    convertFloat32ToInt16: typeof convertFloat32ToInt16Function,
+    convertFloat32ToInt32: typeof convertFloat32ToInt32Function,
+    convertFloat32ToUint8: typeof convertFloat32ToUint8Function,
+    convertInt16ToFloat32: typeof convertInt16ToFloat32Function,
+    convertInt16ToInt32: typeof convertInt16ToInt32Function,
+    convertInt16ToUint8: typeof convertInt16ToUint8Function,
+    convertInt32ToFloat32: typeof convertInt32ToFloat32Function,
+    convertInt32ToInt16: typeof convertInt32ToInt16Function,
+    convertInt32ToUint8: typeof convertInt32ToUint8Function,
+    convertUint8ToFloat32: typeof convertUint8ToFloat32Function,
+    convertUint8ToInt16: typeof convertUint8ToInt16Function,
+    convertUint8ToInt32: typeof convertUint8ToInt32Function
 ) =>
     class FakeAudioData implements INativeAudioData {
         // tslint:disable-next-line:member-access
@@ -104,10 +128,6 @@ export const createFakeAudioDataConstructor = (
 
             const format = options.format ?? this.#format;
 
-            if (format !== this.#format && format !== 'f32-planar') {
-                throw new DOMException("Failed to execute 'allocationSize' on 'AudioData'.", 'NotSupportedError');
-            }
-
             const frameOffset = options.frameOffset ?? 0;
             const frameCount = this.#numberOfFrames - frameOffset;
             const elementCount = computeCopyElementCount(
@@ -172,153 +192,91 @@ export const createFakeAudioDataConstructor = (
                 throw new RangeError("Failed to execute 'copyTo' on 'AudioData'.");
             }
 
-            if (format === 'u8') {
-                const destinationAsUint8Array = convertBufferSourceToTypedArray(destination, Uint8Array);
+            const convertValue = format.startsWith('f32')
+                ? this.#format.startsWith('f32')
+                    ? (value: number) => value
+                    : this.#format.startsWith('s16')
+                      ? convertInt16ToFloat32
+                      : this.#format.startsWith('s32')
+                        ? convertInt32ToFloat32
+                        : convertUint8ToFloat32
+                : format.startsWith('s16')
+                  ? this.#format.startsWith('f32')
+                      ? convertFloat32ToInt16
+                      : this.#format.startsWith('s16')
+                        ? (value: number) => value
+                        : this.#format.startsWith('s32')
+                          ? convertInt32ToInt16
+                          : convertUint8ToInt16
+                  : format.startsWith('s32')
+                    ? this.#format.startsWith('f32')
+                        ? convertFloat32ToInt32
+                        : this.#format.startsWith('s16')
+                          ? convertInt16ToInt32
+                          : this.#format.startsWith('s32')
+                            ? (value: number) => value
+                            : convertUint8ToInt32
+                    : this.#format.startsWith('f32')
+                      ? convertFloat32ToUint8
+                      : this.#format.startsWith('s16')
+                        ? convertInt16ToUint8
+                        : this.#format.startsWith('s32')
+                          ? convertInt32ToUint8
+                          : (value: number) => value;
+            const destinationArray = convertBufferSourceToTypedArray(
+                destination,
+                format.startsWith('f32')
+                    ? Float32Array
+                    : format.startsWith('s16')
+                      ? Int16Array
+                      : format.startsWith('s32')
+                        ? Int32Array
+                        : Uint8Array
+            );
+            const sourceArray = convertBufferSourceToTypedArray(
+                this.#data,
+                this.#format.startsWith('f32')
+                    ? Float32Array
+                    : this.#format.startsWith('s16')
+                      ? Int16Array
+                      : this.#format.startsWith('s32')
+                        ? Int32Array
+                        : Uint8Array
+            );
 
-                if (this.#format === 'u8') {
-                    const dataAsUint8Array = convertBufferSourceToTypedArray(this.#data, Uint8Array);
-
-                    for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        destinationAsUint8Array[i] = dataAsUint8Array[sourceIndex];
+            if (format.endsWith('-planar')) {
+                if (this.#format.endsWith('-planar')) {
+                    for (
+                        let destinationIndex = 0, sourceIndex = this.numberOfFrames * options.planeIndex;
+                        destinationIndex < elementCount;
+                        destinationIndex += 1, sourceIndex += 1
+                    ) {
+                        destinationArray[destinationIndex] = convertValue(sourceArray[sourceIndex]);
                     }
                 } else {
-                    throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'NotSupportedError');
+                    for (
+                        let destinationIndex = 0, sourceIndex = options.planeIndex;
+                        destinationIndex < elementCount;
+                        destinationIndex += 1, sourceIndex += this.#numberOfChannels
+                    ) {
+                        destinationArray[destinationIndex] = convertValue(sourceArray[sourceIndex]);
+                    }
                 }
-            } else if (format === 'u8-planar') {
-                const destinationAsUint8Array = convertBufferSourceToTypedArray(destination, Uint8Array);
-
-                if (this.#format === 'u8-planar') {
-                    const dataAsUint8Array = convertBufferSourceToTypedArray(this.#data, Uint8Array);
-
-                    for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        destinationAsUint8Array[i] = dataAsUint8Array[sourceIndex];
-                    }
-                } else {
-                    throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'NotSupportedError');
+            } else if (this.#format.endsWith('-planar')) {
+                for (
+                    let destinationIndex = 0, sourceIndex = 0;
+                    destinationIndex < elementCount;
+                    destinationIndex += 1,
+                        sourceIndex +=
+                            destinationIndex % this.#numberOfChannels === 0
+                                ? 1 - this.#numberOfFrames * (this.#numberOfChannels - 1)
+                                : this.#numberOfFrames
+                ) {
+                    destinationArray[destinationIndex] = convertValue(sourceArray[sourceIndex]);
                 }
-            } else if (format === 's16') {
-                const destinationAsInt16Array = convertBufferSourceToTypedArray(destination, Int16Array);
-
-                if (this.#format === 's16') {
-                    const dataAsInt16Array = convertBufferSourceToTypedArray(this.#data, Int16Array);
-
-                    for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        destinationAsInt16Array[i] = dataAsInt16Array[sourceIndex];
-                    }
-                } else {
-                    throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'NotSupportedError');
-                }
-            } else if (format === 's16-planar') {
-                const destinationAsInt16Array = convertBufferSourceToTypedArray(destination, Int16Array);
-
-                if (this.#format === 's16-planar') {
-                    const dataAsInt16Array = convertBufferSourceToTypedArray(this.#data, Int16Array);
-
-                    for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        destinationAsInt16Array[i] = dataAsInt16Array[sourceIndex];
-                    }
-                } else {
-                    throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'NotSupportedError');
-                }
-            } else if (format === 's32') {
-                const destinationAsInt32Array = convertBufferSourceToTypedArray(destination, Int32Array);
-
-                if (this.#format === 's32') {
-                    const dataAsInt32Array = convertBufferSourceToTypedArray(this.#data, Int32Array);
-
-                    for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        destinationAsInt32Array[i] = dataAsInt32Array[sourceIndex];
-                    }
-                } else {
-                    throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'NotSupportedError');
-                }
-            } else if (format === 's32-planar') {
-                const destinationAsInt32Array = convertBufferSourceToTypedArray(destination, Int32Array);
-
-                if (this.#format === 's32-planar') {
-                    const dataAsInt32Array = convertBufferSourceToTypedArray(this.#data, Int32Array);
-
-                    for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        destinationAsInt32Array[i] = dataAsInt32Array[sourceIndex];
-                    }
-                } else {
-                    throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'NotSupportedError');
-                }
-            } else if (format === 'f32') {
-                const destinationAsFloat32Array = convertBufferSourceToTypedArray(destination, Float32Array);
-
-                if (this.#format === 'f32') {
-                    const dataAsFloat32Array = convertBufferSourceToTypedArray(this.#data, Float32Array);
-
-                    for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        destinationAsFloat32Array[i] = dataAsFloat32Array[sourceIndex];
-                    }
-                } else {
-                    throw new DOMException("Failed to execute 'copyTo' on 'AudioData'.", 'NotSupportedError');
-                }
-            } else if (format === 'f32-planar') {
-                const destinationAsFloat32Array = convertBufferSourceToTypedArray(destination, Float32Array);
-
-                if (this.#format === 'u8') {
-                    const dataAsUint8Array = convertBufferSourceToTypedArray(this.#data, Uint8Array);
-
-                    for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += this.#numberOfChannels) {
-                        const value = dataAsUint8Array[sourceIndex];
-
-                        destinationAsFloat32Array[i] = (value - 128) * Math.fround(1 / (value < 128 ? 128 : 127));
-                    }
-                } else if (this.#format === 'u8-planar') {
-                    const dataAsUint8Array = convertBufferSourceToTypedArray(this.#data, Uint8Array);
-
-                    for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        const value = dataAsUint8Array[sourceIndex];
-
-                        destinationAsFloat32Array[i] = (value - 128) * Math.fround(1 / (value < 128 ? 128 : 127));
-                    }
-                } else if (this.#format === 's16') {
-                    const dataAsInt16Array = convertBufferSourceToTypedArray(this.#data, Int16Array);
-
-                    for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += this.#numberOfChannels) {
-                        const value = dataAsInt16Array[sourceIndex];
-
-                        destinationAsFloat32Array[i] = value * Math.fround(1 / (value < 0 ? 32768 : 32767));
-                    }
-                } else if (this.#format === 's16-planar') {
-                    const dataAsInt16Array = convertBufferSourceToTypedArray(this.#data, Int16Array);
-
-                    for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        const value = dataAsInt16Array[sourceIndex];
-
-                        destinationAsFloat32Array[i] = value * Math.fround(1 / (value < 0 ? 32768 : 32767));
-                    }
-                } else if (this.#format === 's32') {
-                    const dataAsInt32Array = convertBufferSourceToTypedArray(this.#data, Int32Array);
-
-                    for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += this.#numberOfChannels) {
-                        const value = dataAsInt32Array[sourceIndex];
-
-                        destinationAsFloat32Array[i] = value * Math.fround(1 / (value < 0 ? 2147483648 : 2147483647));
-                    }
-                } else if (this.#format === 's32-planar') {
-                    const dataAsInt32Array = convertBufferSourceToTypedArray(this.#data, Int32Array);
-
-                    for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        const value = dataAsInt32Array[sourceIndex];
-
-                        destinationAsFloat32Array[i] = value * Math.fround(1 / (value < 0 ? 2147483648 : 2147483647));
-                    }
-                } else if (this.#format === 'f32') {
-                    const dataAsFloat32Array = convertBufferSourceToTypedArray(this.#data, Float32Array);
-
-                    for (let i = 0, sourceIndex = options.planeIndex; i < elementCount; i += 1, sourceIndex += this.#numberOfChannels) {
-                        destinationAsFloat32Array[i] = dataAsFloat32Array[sourceIndex];
-                    }
-                } else if (this.#format === 'f32-planar') {
-                    const dataAsFloat32Array = convertBufferSourceToTypedArray(this.#data, Float32Array);
-
-                    for (let i = 0, sourceIndex = this.numberOfFrames * options.planeIndex; i < elementCount; i += 1, sourceIndex += 1) {
-                        destinationAsFloat32Array[i] = dataAsFloat32Array[sourceIndex];
-                    }
+            } else {
+                for (let index = 0; index < elementCount; index += 1) {
+                    destinationArray[index] = convertValue(sourceArray[index]);
                 }
             }
         }
