@@ -785,7 +785,10 @@ describe('AudioDecoder', () => {
             describe('with a known and supported codec', () => {
                 for (const [codec, container, format] of filterSupportedAudioCodecsForDecoding(
                     KNOWN_AUDIO_CODECS.filter(
-                        (knownAudioCodec) => !['mp4a.40.02', 'mp4a.40.05', 'mp4a.40.29', 'mp4a.40.5', 'mp4a.67'].includes(knownAudioCodec)
+                        (knownAudioCodec) =>
+                            !['mp4a.40.02', 'mp4a.40.05', 'mp4a.40.29', 'mp4a.40.5', 'mp4a.67', 'mp4a.69', 'mp4a.6B'].includes(
+                                knownAudioCodec
+                            )
                     ),
                     navigator.userAgent
                 )

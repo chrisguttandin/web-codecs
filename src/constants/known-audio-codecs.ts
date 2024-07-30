@@ -8,6 +8,8 @@ export const KNOWN_AUDIO_CODECS = [
     'mp4a.40.29',
     'mp4a.40.5',
     'mp4a.67',
+    'mp4a.69',
+    'mp4a.6B',
     'opus',
     'pcm-f32',
     'pcm-s16',
