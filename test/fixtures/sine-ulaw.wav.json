@@ -1,0 +1,15 @@
+{
+    "audioDatas": [
+        {
+            "data": [78, 480078],
+            "duration": 5000000,
+            "numberOfFrames": 240000
+        }
+    ],
+    "config": {
+        "codec": "ulaw",
+        "numberOfChannels": 1,
+        "sampleRate": 48000
+    },
+    "encodedAudioChunks": [{ "data": [92, 240092], "duration": 5000000 }]
+}

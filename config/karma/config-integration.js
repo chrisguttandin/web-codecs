@@ -25,6 +25,12 @@ module.exports = (config) => {
                 served: false,
                 watched: true
             },
+            {
+                included: false,
+                pattern: 'test/fixtures/**',
+                served: true,
+                watched: true
+            },
             'test/integration/**/*.js'
         ],
 
@@ -88,10 +94,10 @@ module.exports = (config) => {
                 env.TARGET === 'chrome'
                     ? ['ChromeBrowserStack']
                     : env.TARGET === 'firefox'
-                    ? ['FirefoxBrowserStack']
-                    : env.TARGET === 'safari'
-                    ? ['SafariBrowserStack']
-                    : ['ChromeBrowserStack', 'FirefoxBrowserStack', 'SafariBrowserStack'],
+                      ? ['FirefoxBrowserStack']
+                      : env.TARGET === 'safari'
+                        ? ['SafariBrowserStack']
+                        : ['ChromeBrowserStack', 'FirefoxBrowserStack', 'SafariBrowserStack'],
 
             captureTimeout: 300000,
 
