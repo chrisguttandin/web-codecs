@@ -2,6 +2,8 @@ import { AudioData, AudioEncoder } from '../../src/module';
 import { spy, stub } from 'sinon';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
 import { filterSupportedAudioCodecsForEncoding } from '../helpers/filter-supported-audio-codecs-for-encoding';
+import { loadFixtureAsArrayBuffer } from '../helpers/load-fixture-as-array-buffer';
+import { loadFixtureAsJson } from '../helpers/load-fixture-as-json';
 
 describe('AudioEncoder', () => {
     let error;
@@ -9,11 +11,10 @@ describe('AudioEncoder', () => {
 
     beforeEach(() => {
         error = stub();
-        output = () => {
-            throw new Error('This should never be called.');
-        };
+        output = stub();
 
         error.throws(new Error('This should never be called.'));
+        output.throws(new Error('This should never be called.'));
     });
 
     describe('isConfigSupported()', () => {
@@ -296,6 +297,28 @@ describe('AudioEncoder', () => {
                 audioEncoder.close();
 
                 expect(audioEncoder.state).to.equal('closed');
+            });
+        });
+
+        describe('with a configured AudioEncoder', () => {
+            describe('with a known and supported codec', () => {
+                for (const codec of filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent)) {
+                    describe(`with "${codec}"`, () => {
+                        beforeEach(() => {
+                            audioEncoder.configure({
+                                codec,
+                                numberOfChannels: 1,
+                                sampleRate: 48000
+                            });
+                        });
+
+                        it("should set the state to 'closed'", () => {
+                            audioEncoder.close();
+
+                            expect(audioEncoder.state).to.equal('closed');
+                        });
+                    });
+                }
             });
         });
 
@@ -625,6 +648,88 @@ describe('AudioEncoder', () => {
             });
         });
 
+        describe('with a configured AudioEncoder', () => {
+            describe('with a known and supported codec', () => {
+                for (const codec of filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent)) {
+                    describe(`with "${codec}"`, () => {
+                        let config;
+
+                        beforeEach(async () => {
+                            config = {
+                                codec,
+                                numberOfChannels: 1,
+                                sampleRate: 48000
+                            };
+
+                            audioEncoder.configure(config);
+
+                            await new Promise((resolve) => {
+                                setTimeout(resolve);
+                            });
+
+                            error.resetBehavior();
+                        });
+
+                        if (filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
+                            it('should not trigger a NotSupportedError', async () => {
+                                audioEncoder.configure(config);
+
+                                expect(error).to.have.not.been.called;
+
+                                await new Promise((resolve) => {
+                                    setTimeout(resolve);
+                                });
+
+                                expect(error).to.have.not.been.called;
+                            });
+
+                            it('should change the state', async () => {
+                                audioEncoder.configure(config);
+
+                                expect(audioEncoder.state).to.equal('configured');
+
+                                await new Promise((resolve) => {
+                                    setTimeout(resolve);
+                                });
+
+                                expect(audioEncoder.state).to.equal('configured');
+                            });
+                        } else {
+                            it('should trigger a NotSupportedError', async () => {
+                                audioEncoder.configure(config);
+
+                                expect(error).to.have.not.been.called;
+
+                                await new Promise((resolve) => {
+                                    setTimeout(resolve);
+                                });
+
+                                expect(error).to.have.been.calledOnce;
+
+                                const { args } = error.getCall(0);
+
+                                expect(args.length).to.equal(1);
+                                expect(args[0].code).to.equal(9);
+                                expect(args[0].name).to.equal('NotSupportedError');
+                            });
+
+                            it('should change the state', async () => {
+                                audioEncoder.configure(config);
+
+                                expect(audioEncoder.state).to.equal('configured');
+
+                                await new Promise((resolve) => {
+                                    setTimeout(resolve);
+                                });
+
+                                expect(audioEncoder.state).to.equal('closed');
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
         describe('with a closed AudioEncoder', () => {
             beforeEach(() => audioEncoder.close());
 
@@ -655,7 +760,7 @@ describe('AudioEncoder', () => {
                 format: 'f32',
                 numberOfChannels: 1,
                 numberOfFrames: 10,
-                sampleRate: 8000,
+                sampleRate: 48000,
                 timestamp: 0
             });
             audioEncoder = new AudioEncoder({
@@ -673,6 +778,132 @@ describe('AudioEncoder', () => {
                     expect(err.name).to.equal('InvalidStateError');
 
                     done();
+                }
+            });
+        });
+
+        describe('with a configured AudioEncoder', () => {
+            beforeEach(() => {
+                output.resetBehavior();
+            });
+
+            describe('with a known and supported codec', () => {
+                for (const [codec, container, format] of filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).map(
+                    (knownAudioCodec) =>
+                        knownAudioCodec === 'mp4a.40.02'
+                            ? [knownAudioCodec, 'aac', 's16']
+                            : knownAudioCodec === 'mp4a.40.05'
+                              ? [knownAudioCodec, 'aac', 's16']
+                              : knownAudioCodec === 'mp4a.40.2'
+                                ? [knownAudioCodec, 'aac', 's16']
+                                : knownAudioCodec === 'mp4a.40.29'
+                                  ? [knownAudioCodec, 'aac', 's16']
+                                  : knownAudioCodec === 'mp4a.40.5'
+                                    ? [knownAudioCodec, 'aac', 's16']
+                                    : knownAudioCodec === 'mp4a.67'
+                                      ? [knownAudioCodec, 'aac', 's16']
+                                      : knownAudioCodec === 'opus'
+                                        ? [knownAudioCodec, 'ogg', 's16']
+                                        : null
+                )) {
+                    describe(`with "${codec}" wrapped in "${container}"`, () => {
+                        let decodedArrayBuffer;
+                        let encodedArrayBuffer;
+                        let json;
+
+                        beforeEach(async () => {
+                            const escapedCodec = codec.replaceAll('.', '-');
+
+                            [decodedArrayBuffer, encodedArrayBuffer, json] = await Promise.all([
+                                loadFixtureAsArrayBuffer(`sine-pcm-${format}.wav`),
+                                loadFixtureAsArrayBuffer(`sine-pcm-${format}.${escapedCodec}.${container}`),
+                                loadFixtureAsJson(`sine-pcm-${format}.${escapedCodec}.json`)
+                            ]);
+
+                            audioEncoder.configure(json.config);
+                        });
+
+                        it('should emit multiple instances of the EncodedAudioChunk constructor', async () => {
+                            json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
+                                audioEncoder.encode(
+                                    new AudioData({
+                                        data: decodedArrayBuffer.slice(...data),
+                                        format,
+                                        numberOfChannels: json.config.numberOfChannels,
+                                        numberOfFrames,
+                                        sampleRate: json.config.sampleRate,
+                                        timestamp
+                                    })
+                                );
+
+                                return timestamp + duration;
+                            }, 0);
+
+                            await audioEncoder.flush();
+
+                            const calls = output.getCalls();
+
+                            expect(calls.length).to.equal(json.encodedAudioChunks.length);
+
+                            calls.reduce((timestamp, call, index) => {
+                                expect(call.args.length).to.equal(2);
+
+                                const [encodedAudioChunk, encodedAudioChunkMetadata] = call.args;
+                                const { byteLength, data, decoderConfig, duration, type } = json.encodedAudioChunks[index];
+
+                                // eslint-disable-next-line no-undef
+                                if (codec === 'opus' && !process.env.CI) {
+                                    expect(encodedAudioChunk.byteLength).to.equal(byteLength);
+                                }
+
+                                if (codec === 'opus' && encodedAudioChunk.duration === 19999) {
+                                    expect(encodedAudioChunk.duration).to.equal(duration - 1);
+                                } else if (codec === 'opus' && encodedAudioChunk.duration === 20001) {
+                                    expect(encodedAudioChunk.duration).to.equal(duration + 1);
+                                } else {
+                                    expect(encodedAudioChunk.duration).to.equal(duration);
+                                }
+
+                                if (
+                                    codec === 'opus' &&
+                                    [259999, 519999, 1039999, 2059999, 2079999, 4099999, 4119999, 4139999, 4159999, 4179999].includes(
+                                        encodedAudioChunk.timestamp
+                                    )
+                                ) {
+                                    expect(encodedAudioChunk.timestamp).to.equal(timestamp - 1);
+                                } else {
+                                    expect(encodedAudioChunk.timestamp).to.equal(timestamp);
+                                }
+
+                                expect(encodedAudioChunk.type).to.equal(type);
+
+                                // eslint-disable-next-line no-undef
+                                if (!process.env.CI) {
+                                    const uint8Array = new Uint8Array(encodedAudioChunk.byteLength);
+
+                                    encodedAudioChunk.copyTo(uint8Array);
+
+                                    expect(Array.from(uint8Array)).to.deep.equal(
+                                        Array.from(new Uint8Array(encodedArrayBuffer.slice(...data)))
+                                    );
+                                }
+
+                                if (decoderConfig === null) {
+                                    expect(encodedAudioChunkMetadata).to.deep.equal({});
+                                } else if (decoderConfig.description === undefined) {
+                                    expect(encodedAudioChunkMetadata).to.deep.equal({
+                                        decoderConfig
+                                    });
+                                } else {
+                                    expect(encodedAudioChunkMetadata).to.deep.equal({
+                                        decoderConfig: { ...decoderConfig, description: new Uint8Array(decoderConfig.description).buffer }
+                                    });
+                                }
+
+                                return timestamp + duration;
+                            }, 0);
+                        });
+                    });
                 }
             });
         });
@@ -714,6 +945,26 @@ describe('AudioEncoder', () => {
             });
         });
 
+        describe('with a configured AudioEncoder', () => {
+            describe('with a known and supported codec', () => {
+                for (const codec of filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent)) {
+                    describe(`with "${codec}"`, () => {
+                        beforeEach(() => {
+                            audioEncoder.configure({
+                                codec,
+                                numberOfChannels: 1,
+                                sampleRate: 48000
+                            });
+                        });
+
+                        it('should resolve to undefined', async () => {
+                            expect(await audioEncoder.flush()).to.be.undefined;
+                        });
+                    });
+                }
+            });
+        });
+
         describe('with a closed AudioEncoder', () => {
             beforeEach(() => audioEncoder.close());
 
@@ -743,6 +994,28 @@ describe('AudioEncoder', () => {
                 audioEncoder.reset();
 
                 expect(audioEncoder.state).to.equal('unconfigured');
+            });
+        });
+
+        describe('with a configured AudioEncoder', () => {
+            describe('with a known and supported codec', () => {
+                for (const codec of filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent)) {
+                    describe(`with "${codec}"`, () => {
+                        beforeEach(() => {
+                            audioEncoder.configure({
+                                codec,
+                                numberOfChannels: 1,
+                                sampleRate: 48000
+                            });
+                        });
+
+                        it("should set the state to 'unconfigured'", () => {
+                            audioEncoder.reset();
+
+                            expect(audioEncoder.state).to.equal('unconfigured');
+                        });
+                    });
+                }
             });
         });
 
