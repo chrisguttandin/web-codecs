@@ -1,8 +1,7 @@
-import { TEventHandler, TNativeCodecState } from '../types';
+import { TEventHandler, TNativeAudioEncoderConfig, TNativeCodecState } from '../types';
 import { IAudioEncoderEventMap } from './audio-encoder-event-map';
 import { IEventTarget } from './event-target';
 import { INativeAudioData } from './native-audio-data';
-import { INativeAudioEncoderConfig } from './native-audio-encoder-config';
 
 export interface IAudioEncoder extends IEventTarget<IAudioEncoderEventMap> {
     readonly encodeQueueSize: number;
@@ -13,7 +12,7 @@ export interface IAudioEncoder extends IEventTarget<IAudioEncoderEventMap> {
 
     close(): void;
 
-    configure(config: INativeAudioEncoderConfig): void;
+    configure(config: TNativeAudioEncoderConfig): void;
 
     encode(data: INativeAudioData): void;
 

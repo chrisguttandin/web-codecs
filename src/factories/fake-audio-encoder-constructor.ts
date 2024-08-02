@@ -1,6 +1,6 @@
 import type { createIsKnownAudioCodec } from '../factories/is-known-codec';
-import { INativeAudioEncoder, INativeAudioEncoderConfig, INativeAudioEncoderInit, INativeAudioEncoderSupport } from '../interfaces';
-import { TNativeCodecState, TNativeWebCodecsErrorCallback } from '../types';
+import { INativeAudioEncoder, INativeAudioEncoderInit, INativeAudioEncoderSupport } from '../interfaces';
+import { TNativeAudioEncoderConfig, TNativeCodecState, TNativeWebCodecsErrorCallback } from '../types';
 
 export const createFakeAudioEncoderConstructor = (isKnownCodec: ReturnType<typeof createIsKnownAudioCodec>) =>
     class FakeAudioEncoder extends EventTarget implements Omit<INativeAudioEncoder, 'ondequeue'> {
@@ -41,7 +41,7 @@ export const createFakeAudioEncoderConstructor = (isKnownCodec: ReturnType<typeo
             this.#state = 'closed';
         }
 
-        public configure(config: INativeAudioEncoderConfig): void {
+        public configure(config: TNativeAudioEncoderConfig): void {
             if (isKnownCodec(config.codec) && config.numberOfChannels > 0 && config.sampleRate > 0) {
                 if (this.#state === 'closed') {
                     throw new DOMException("Failed to execute 'configure' on 'AudioEncoder'.", 'InvalidStateError');
@@ -72,13 +72,13 @@ export const createFakeAudioEncoderConstructor = (isKnownCodec: ReturnType<typeo
             }
         }
 
-        public static isConfigSupported(config: INativeAudioEncoderConfig): Promise<INativeAudioEncoderSupport> {
+        public static isConfigSupported(config: TNativeAudioEncoderConfig): Promise<INativeAudioEncoderSupport> {
             return new Promise<INativeAudioEncoderSupport>((resolve, reject) => {
                 if (isKnownCodec(config.codec) && config.numberOfChannels > 0 && config.sampleRate > 0) {
                     resolve({
                         config: {
                             bitrateMode: 'variable',
-                            ...(<INativeAudioEncoderConfig>(
+                            ...(<TNativeAudioEncoderConfig>(
                                 Object.fromEntries(
                                     Object.entries(config).filter(([key]) =>
                                         ['bitrate', 'bitrateMode', 'codec', 'numberOfChannels', 'sampleRate'].includes(key)

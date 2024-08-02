@@ -1,6 +1,7 @@
 export * from './event-handler';
 export * from './native-audio-data-constructor';
 export * from './native-audio-data-output-callback';
+export * from './native-audio-encoder-config';
 export * from './native-audio-sample-format';
 export * from './native-bitrate-mode';
 export * from './native-codec-state';

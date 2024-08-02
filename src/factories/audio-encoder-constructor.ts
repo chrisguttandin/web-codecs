@@ -1,12 +1,11 @@
 import {
     INativeAudioData,
     INativeAudioEncoder,
-    INativeAudioEncoderConfig,
     INativeAudioEncoderConstructor,
     INativeAudioEncoderInit,
     INativeAudioEncoderSupport
 } from '../interfaces';
-import { TEventHandler, TNativeCodecState } from '../types';
+import { TEventHandler, TNativeAudioEncoderConfig, TNativeCodecState } from '../types';
 import type { createFakeAudioEncoderConstructor } from './fake-audio-encoder-constructor';
 import type { createNativeAudioEncoderConstructor } from './native-audio-encoder-constructor';
 
@@ -63,7 +62,7 @@ export const createAudioEncoderConstructor = (
             return this.#internalAudioEncoder.close();
         }
 
-        public configure(config: INativeAudioEncoderConfig): void {
+        public configure(config: TNativeAudioEncoderConfig): void {
             // Bug #9 & #10: Chrome does not throw a TypeError if numberOfChannels or sampleRate are zero.
             if (nativeAudioEncoderConstructor === null || (config.numberOfChannels > 0 && config.sampleRate > 0)) {
                 return this.#internalAudioEncoder.configure(config);
@@ -84,7 +83,7 @@ export const createAudioEncoderConstructor = (
             return this.#internalAudioEncoder.reset();
         }
 
-        public static isConfigSupported(config: INativeAudioEncoderConfig): Promise<INativeAudioEncoderSupport> {
+        public static isConfigSupported(config: TNativeAudioEncoderConfig): Promise<INativeAudioEncoderSupport> {
             return nativeAudioEncoderConstructor === null
                 ? fakeAudioEncoderConstructor.isConfigSupported(config)
                 : nativeAudioEncoderConstructor

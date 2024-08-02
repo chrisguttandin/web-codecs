@@ -1,7 +1,7 @@
-import { INativeAudioEncoderConfig } from './native-audio-encoder-config';
+import { TNativeAudioEncoderConfig } from '../types';
 
 export interface INativeAudioEncoderSupport {
-    config: INativeAudioEncoderConfig;
+    config: TNativeAudioEncoderConfig;
 
     supported: boolean;
 }
