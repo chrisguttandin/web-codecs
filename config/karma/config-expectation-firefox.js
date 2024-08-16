@@ -92,7 +92,7 @@ module.exports = (config) => {
         });
     } else {
         config.set({
-            browsers: ['FirefoxDeveloperHeadless', 'FirefoxHeadless']
+            browsers: ['FirefoxHeadless']
         });
     }
 };
