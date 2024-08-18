@@ -43,5 +43,15 @@ export const createEncodedAudioChunkConstructor = (
         public copyTo(destination: BufferSource): void {
             return this.#internalEncodedAudioChunk.copyTo(destination);
         }
+
+        public static [Symbol.hasInstance](instance: unknown): boolean {
+            return (
+                instance !== null &&
+                typeof instance === 'object' &&
+                (Object.getPrototypeOf(instance) === EncodedAudioChunk.prototype ||
+                    (nativeEncodedAudioChunkConstructor !== null &&
+                        Object.getPrototypeOf(instance) === nativeEncodedAudioChunkConstructor.prototype))
+            );
+        }
     };
 };

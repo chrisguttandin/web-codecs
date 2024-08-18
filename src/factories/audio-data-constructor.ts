@@ -93,5 +93,14 @@ export const createAudioDataConstructor = (
         public copyTo(destination: BufferSource, options: INativeAudioDataCopyToOptions): void {
             return this.#internalAudioData.copyTo(destination, options);
         }
+
+        public static [Symbol.hasInstance](instance: unknown): boolean {
+            return (
+                instance !== null &&
+                typeof instance === 'object' &&
+                (Object.getPrototypeOf(instance) === AudioData.prototype ||
+                    (nativeAudioDataConstructor !== null && Object.getPrototypeOf(instance) === nativeAudioDataConstructor.prototype))
+            );
+        }
     };
 };

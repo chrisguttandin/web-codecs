@@ -1,4 +1,4 @@
-import { AudioDecoder, EncodedAudioChunk } from '../../src/module';
+import { AudioData, AudioDecoder, EncodedAudioChunk } from '../../src/module';
 import { spy, stub } from 'sinon';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
 import { filterSupportedAudioCodecsForDecoding } from '../helpers/filter-supported-audio-codecs-for-decoding';
@@ -863,6 +863,13 @@ describe('AudioDecoder', () => {
                                 expect(call.args.length).to.equal(1);
 
                                 const [audioData] = call.args;
+
+                                expect(audioData).to.be.an.instanceOf(AudioData);
+
+                                if (window.AudioData !== undefined) {
+                                    expect(audioData).to.be.an.instanceOf(window.AudioData);
+                                }
+
                                 const { data, duration, numberOfFrames } = json.audioDatas[index];
 
                                 expect(audioData.duration).to.equal(duration);
