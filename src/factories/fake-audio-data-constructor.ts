@@ -12,6 +12,7 @@ import type { convertInt32ToUint8 as convertInt32ToUint8Function } from '../func
 import type { convertUint8ToFloat32 as convertUint8ToFloat32Function } from '../functions/convert-uint8-to-float32';
 import type { convertUint8ToInt16 as convertUint8ToInt16Function } from '../functions/convert-uint8-to-int16';
 import type { convertUint8ToInt32 as convertUint8ToInt32Function } from '../functions/convert-uint8-to-int32';
+import type { detachArrayBuffer as detachArrayBufferFunction } from '../functions/detach-array-buffer';
 import { INativeAudioData, INativeAudioDataCopyToOptions, INativeAudioDataInit } from '../interfaces';
 import { TNativeAudioSampleFormat } from '../types';
 
@@ -29,7 +30,8 @@ export const createFakeAudioDataConstructor = (
     convertInt32ToUint8: typeof convertInt32ToUint8Function,
     convertUint8ToFloat32: typeof convertUint8ToFloat32Function,
     convertUint8ToInt16: typeof convertUint8ToInt16Function,
-    convertUint8ToInt32: typeof convertUint8ToInt32Function
+    convertUint8ToInt32: typeof convertUint8ToInt32Function,
+    detachArrayBuffer: typeof detachArrayBufferFunction
 ) =>
     class FakeAudioData implements INativeAudioData {
         // tslint:disable-next-line:member-access
@@ -81,10 +83,7 @@ export const createFakeAudioDataConstructor = (
                 }
 
                 for (const arrayBuffer of init.transfer) {
-                    const { port1 } = new MessageChannel();
-
-                    port1.postMessage(arrayBuffer, [arrayBuffer]);
-                    port1.close();
+                    detachArrayBuffer(arrayBuffer);
                 }
             }
 

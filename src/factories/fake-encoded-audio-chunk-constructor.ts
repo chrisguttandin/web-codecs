@@ -1,9 +1,11 @@
 import type { convertBufferSourceToTypedArray as convertBufferSourceToTypedArrayFunction } from '../functions/convert-buffer-source-to-typed-array';
+import type { detachArrayBuffer as detachArrayBufferFunction } from '../functions/detach-array-buffer';
 import { INativeEncodedAudioChunk, INativeEncodedAudioChunkInit } from '../interfaces';
 import { TNativeEncodedAudioChunkType } from '../types';
 
 export const createFakeEncodedAudioChunkConstructor = (
-    convertBufferSourceToTypedArray: ReturnType<typeof convertBufferSourceToTypedArrayFunction>
+    convertBufferSourceToTypedArray: ReturnType<typeof convertBufferSourceToTypedArrayFunction>,
+    detachArrayBuffer: typeof detachArrayBufferFunction
 ) =>
     class FakeEncodedAudioChunk implements INativeEncodedAudioChunk {
         // tslint:disable-next-line:member-access
@@ -29,10 +31,7 @@ export const createFakeEncodedAudioChunkConstructor = (
                 }
 
                 for (const arrayBuffer of init.transfer) {
-                    const { port1 } = new MessageChannel();
-
-                    port1.postMessage(arrayBuffer, [arrayBuffer]);
-                    port1.close();
+                    detachArrayBuffer(arrayBuffer);
                 }
             }
 

@@ -27,6 +27,7 @@ import { convertInt32ToUint8 } from './functions/convert-int32-to-uint8';
 import { convertUint8ToFloat32 } from './functions/convert-uint8-to-float32';
 import { convertUint8ToInt16 } from './functions/convert-uint8-to-int16';
 import { convertUint8ToInt32 } from './functions/convert-uint8-to-int32';
+import { detachArrayBuffer } from './functions/detach-array-buffer';
 import { INativeAudioData, INativeEncodedAudioChunk } from './interfaces';
 
 /*
@@ -50,7 +51,8 @@ const fakeAudioDataConstructor = createFakeAudioDataConstructor(
     convertInt32ToUint8,
     convertUint8ToFloat32,
     convertUint8ToInt16,
-    convertUint8ToInt32
+    convertUint8ToInt32,
+    detachArrayBuffer
 );
 const window = createWindow();
 const nativeAudioDataConstructor = createNativeAudioDataConstructor(window);
@@ -77,7 +79,7 @@ const audioEncoderConstructor = createAudioEncoderConstructor(fakeAudioEncoderCo
 
 export { audioEncoderConstructor as AudioEncoder };
 
-const fakeEncodedAudioChunkConstructor = createFakeEncodedAudioChunkConstructor(convertBufferSourceToTypedArray);
+const fakeEncodedAudioChunkConstructor = createFakeEncodedAudioChunkConstructor(convertBufferSourceToTypedArray, detachArrayBuffer);
 const nativeEncodedAudioChunkConstructor = createNativeEncodedAudioChunkConstructor(window);
 const encodedAudioChunkConstructor = createEncodedAudioChunkConstructor(
     fakeEncodedAudioChunkConstructor,
