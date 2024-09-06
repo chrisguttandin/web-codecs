@@ -1,8 +1,12 @@
 import type { createIsKnownAudioCodec } from '../factories/is-known-codec';
+import type { filterEntries as filterEntriesFunction } from '../functions/filter-entries';
 import { INativeAudioEncoder, INativeAudioEncoderInit, INativeAudioEncoderSupport } from '../interfaces';
 import { TNativeAudioEncoderConfig, TNativeCodecState, TNativeWebCodecsErrorCallback } from '../types';
 
-export const createFakeAudioEncoderConstructor = (isKnownCodec: ReturnType<typeof createIsKnownAudioCodec>) =>
+export const createFakeAudioEncoderConstructor = (
+    filterEntries: typeof filterEntriesFunction,
+    isKnownCodec: ReturnType<typeof createIsKnownAudioCodec>
+) =>
     class FakeAudioEncoder extends EventTarget implements Omit<INativeAudioEncoder, 'ondequeue'> {
         // tslint:disable-next-line:member-access
         #encodeQueueSize: number;
@@ -78,13 +82,44 @@ export const createFakeAudioEncoderConstructor = (isKnownCodec: ReturnType<typeo
                     resolve({
                         config: {
                             bitrateMode: 'variable',
-                            ...(<TNativeAudioEncoderConfig>(
-                                Object.fromEntries(
-                                    Object.entries(config).filter(([key]) =>
-                                        ['bitrate', 'bitrateMode', 'codec', 'numberOfChannels', 'sampleRate'].includes(key)
-                                    )
-                                )
-                            ))
+                            ...filterEntries(
+                                Object.entries(config).map(([key, value]) => {
+                                    if (key === 'aac') {
+                                        return [key, filterEntries(Object.entries(value), 'format')];
+                                    }
+
+                                    if (key === 'flac') {
+                                        return [key, filterEntries(Object.entries(value), 'blockSize', 'complexity')];
+                                    }
+
+                                    if (key === 'opus') {
+                                        return [
+                                            key,
+                                            filterEntries(
+                                                Object.entries(value),
+                                                'application',
+                                                'complexity',
+                                                'format',
+                                                'frameDuration',
+                                                'packetlossperc',
+                                                'signal',
+                                                'usedtx',
+                                                'useinbandfec'
+                                            )
+                                        ];
+                                    }
+
+                                    return [key, value];
+                                }),
+                                'aac',
+                                'bitrate',
+                                'bitrateMode',
+                                'codec',
+                                'flac',
+                                'numberOfChannels',
+                                'opus',
+                                'sampleRate'
+                            )
                         },
                         supported: false
                     });

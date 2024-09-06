@@ -28,6 +28,7 @@ import { convertUint8ToFloat32 } from './functions/convert-uint8-to-float32';
 import { convertUint8ToInt16 } from './functions/convert-uint8-to-int16';
 import { convertUint8ToInt32 } from './functions/convert-uint8-to-int32';
 import { detachArrayBuffer } from './functions/detach-array-buffer';
+import { filterEntries } from './functions/filter-entries';
 import { INativeAudioData, INativeEncodedAudioChunk } from './interfaces';
 
 /*
@@ -62,7 +63,7 @@ const audioDataConstructor = createAudioDataConstructor(fakeAudioDataConstructor
 export { audioDataConstructor as AudioData };
 
 const isKnownAudioCodec = createIsKnownAudioCodec(KNOWN_AUDIO_CODECS);
-const fakeAudioDecoderConstructor = createFakeAudioDecoderConstructor(isKnownAudioCodec);
+const fakeAudioDecoderConstructor = createFakeAudioDecoderConstructor(filterEntries, isKnownAudioCodec);
 const nativeAudioDecoderConstructor = createNativeAudioDecoderConstructor(window);
 const nativeEncodedAudioChunks = new WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>();
 const audioDecoderConstructor = createAudioDecoderConstructor(
@@ -73,7 +74,7 @@ const audioDecoderConstructor = createAudioDecoderConstructor(
 
 export { audioDecoderConstructor as AudioDecoder };
 
-const fakeAudioEncoderConstructor = createFakeAudioEncoderConstructor(isKnownAudioCodec);
+const fakeAudioEncoderConstructor = createFakeAudioEncoderConstructor(filterEntries, isKnownAudioCodec);
 const nativeAudioEncoderConstructor = createNativeAudioEncoderConstructor(window);
 const audioEncoderConstructor = createAudioEncoderConstructor(fakeAudioEncoderConstructor, nativeAudioDatas, nativeAudioEncoderConstructor);
 

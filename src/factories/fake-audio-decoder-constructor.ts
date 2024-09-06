@@ -1,8 +1,12 @@
 import type { createIsKnownAudioCodec } from '../factories/is-known-codec';
+import type { filterEntries as filterEntriesFunction } from '../functions/filter-entries';
 import { INativeAudioDecoder, INativeAudioDecoderConfig, INativeAudioDecoderInit, INativeAudioDecoderSupport } from '../interfaces';
 import { TNativeCodecState, TNativeWebCodecsErrorCallback } from '../types';
 
-export const createFakeAudioDecoderConstructor = (isKnownCodec: ReturnType<typeof createIsKnownAudioCodec>) =>
+export const createFakeAudioDecoderConstructor = (
+    filterEntries: typeof filterEntriesFunction,
+    isKnownCodec: ReturnType<typeof createIsKnownAudioCodec>
+) =>
     class FakeAudioDecoder extends EventTarget implements Omit<INativeAudioDecoder, 'ondequeue'> {
         // tslint:disable-next-line:member-access
         #decodeQueueSize: number;
@@ -76,13 +80,7 @@ export const createFakeAudioDecoderConstructor = (isKnownCodec: ReturnType<typeo
             return new Promise<INativeAudioDecoderSupport>((resolve, reject) => {
                 if (isKnownCodec(config.codec)) {
                     resolve({
-                        config: <INativeAudioDecoderConfig>(
-                            Object.fromEntries(
-                                Object.entries(config).filter(([key]) =>
-                                    ['codec', 'description', 'numberOfChannels', 'sampleRate'].includes(key)
-                                )
-                            )
-                        ),
+                        config: filterEntries(Object.entries(config), 'codec', 'description', 'numberOfChannels', 'sampleRate'),
                         supported: false
                     });
                 } else {
