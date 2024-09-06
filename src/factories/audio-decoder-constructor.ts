@@ -20,6 +20,9 @@ export const createAudioDecoderConstructor = (
         #internalAudioDecoder: Omit<INativeAudioDecoder, 'ondequeue'>;
 
         // tslint:disable-next-line:member-access
+        #numberOfFrames = 0;
+
+        // tslint:disable-next-line:member-access
         #ondequeue: null | [TEventHandler<this>, TEventHandler<this>];
 
         constructor(init: INativeAudioDecoderInit) {
@@ -27,7 +30,27 @@ export const createAudioDecoderConstructor = (
 
             // Bug #5: AudioDecoder is not yet implemented in Firefox and Safari.
             this.#internalAudioDecoder =
-                nativeAudioDecoderConstructor === null ? new fakeAudioDecoderConstructor(init) : new nativeAudioDecoderConstructor(init);
+                nativeAudioDecoderConstructor === null
+                    ? new fakeAudioDecoderConstructor(init)
+                    : new nativeAudioDecoderConstructor({
+                          ...init,
+                          ...(typeof init.output === 'function'
+                              ? {
+                                    // Bug #11: Chrome sometimes gets the timestamp slightly wrong.
+                                    output: (audioData) => {
+                                        const timestamp = Math.floor((this.#numberOfFrames * 1000000) / audioData.sampleRate);
+
+                                        if (audioData.timestamp !== timestamp) {
+                                            Object.defineProperty(audioData, 'timestamp', { get: () => timestamp });
+                                        }
+
+                                        this.#numberOfFrames += audioData.numberOfFrames;
+
+                                        init.output(audioData);
+                                    }
+                                }
+                              : {})
+                      });
             this.#ondequeue = null;
         }
 
@@ -76,6 +99,8 @@ export const createAudioDecoderConstructor = (
         }
 
         public reset(): void {
+            this.#numberOfFrames = 0;
+
             return this.#internalAudioDecoder.reset();
         }
 

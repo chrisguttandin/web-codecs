@@ -859,7 +859,7 @@ describe('AudioDecoder', () => {
 
                             expect(calls.length).to.equal(json.audioDatas.length);
 
-                            calls.reduce((timestamp, call, index) => {
+                            calls.reduce((totalNumberOfFrames, call, index) => {
                                 expect(call.args.length).to.equal(1);
 
                                 const [audioData] = call.args;
@@ -877,28 +877,7 @@ describe('AudioDecoder', () => {
                                 expect(audioData.numberOfChannels).to.equal(1);
                                 expect(audioData.numberOfFrames).to.equal(numberOfFrames);
                                 expect(audioData.sampleRate).to.equal(48000);
-
-                                if (codec === 'flac' && [4128000].includes(timestamp)) {
-                                    expect(audioData.timestamp).to.equal(timestamp - 1);
-                                } else if (
-                                    codec === 'mp3' &&
-                                    [1032000, 2064000, 2088000, 4104000, 4128000, 4152000, 4176000].includes(timestamp)
-                                ) {
-                                    expect(audioData.timestamp).to.equal(timestamp - 1);
-                                } else if (codec === 'mp4a.40.2' && [4160000].includes(timestamp)) {
-                                    expect(audioData.timestamp).to.equal(timestamp - 1);
-                                } else if (
-                                    codec === 'opus' &&
-                                    [513500, 1033500, 2053500, 2073500, 2093500, 4113500, 4133500, 4153500, 4173500, 4193500].includes(
-                                        timestamp
-                                    )
-                                ) {
-                                    expect(audioData.timestamp).to.equal(timestamp - 1);
-                                } else if (codec === 'vorbis' && [524000, 1036000, 2060000, 4108000, 4172000].includes(timestamp)) {
-                                    expect(audioData.timestamp).to.equal(timestamp - 1);
-                                } else {
-                                    expect(audioData.timestamp).to.equal(timestamp);
-                                }
+                                expect(audioData.timestamp).to.equal(Math.floor((totalNumberOfFrames * 1000000) / audioData.sampleRate));
 
                                 // eslint-disable-next-line no-undef
                                 if (!process.env.CI) {
@@ -911,7 +890,7 @@ describe('AudioDecoder', () => {
                                     );
                                 }
 
-                                return (timestamp + duration).toString().endsWith('999') ? timestamp + duration + 1 : timestamp + duration;
+                                return totalNumberOfFrames + numberOfFrames;
                             }, 0);
                         });
                     });
