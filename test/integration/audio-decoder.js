@@ -874,9 +874,9 @@ describe('AudioDecoder', () => {
 
                                 expect(audioData.duration).to.equal(duration);
                                 expect(audioData.format).to.equal(format);
-                                expect(audioData.numberOfChannels).to.equal(1);
+                                expect(audioData.numberOfChannels).to.equal(json.config.numberOfChannels);
                                 expect(audioData.numberOfFrames).to.equal(numberOfFrames);
-                                expect(audioData.sampleRate).to.equal(48000);
+                                expect(audioData.sampleRate).to.equal(json.config.sampleRate);
                                 expect(audioData.timestamp).to.equal(Math.floor((totalNumberOfFrames * 1000000) / audioData.sampleRate));
 
                                 // eslint-disable-next-line no-undef
