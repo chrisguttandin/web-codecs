@@ -51,6 +51,9 @@ export const createAudioDataConstructor = (
 
             if (nativeAudioDataConstructor !== null) {
                 nativeAudioDatas.set(this, this.#internalAudioData);
+
+                // This violates all good pratices but it is necessary to allow this AudioData to be used with the native implementation.
+                return <AudioData>this.#internalAudioData;
             }
         }
 

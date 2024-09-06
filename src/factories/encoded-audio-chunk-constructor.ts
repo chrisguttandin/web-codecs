@@ -21,6 +21,12 @@ export const createEncodedAudioChunkConstructor = (
 
             if (nativeEncodedAudioChunkConstructor !== null) {
                 nativeEncodedAudioChunks.set(this, this.#internalEncodedAudioChunk);
+
+                /*
+                 * This violates all good pratices but it is necessary to allow this EncodedAudioChunk to be used with the native
+                 * implementation.
+                 */
+                return <EncodedAudioChunk>this.#internalEncodedAudioChunk;
             }
         }
 
