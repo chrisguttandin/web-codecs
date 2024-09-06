@@ -1,4 +1,6 @@
-import { spy } from 'sinon';
+import { spy, stub } from 'sinon';
+import { loadFixtureAsArrayBuffer } from '../../helpers/load-fixture-as-array-buffer';
+import { loadFixtureAsJson } from '../../helpers/load-fixture-as-json';
 
 describe('AudioEncoder', () => {
     describe('isConfigSupported()', () => {
@@ -118,6 +120,116 @@ describe('AudioEncoder', () => {
                 });
 
                 expect(audioEncoder.state).to.equal('closed');
+            });
+        });
+    });
+
+    describe('encode()', () => {
+        let audioEncoder;
+        let output;
+
+        beforeEach(() => {
+            output = spy();
+
+            // eslint-disable-next-line no-undef
+            audioEncoder = new AudioEncoder({
+                error: () => {
+                    throw new Error('This should never be called.');
+                },
+                output
+            });
+        });
+
+        describe('with an opus file', () => {
+            let decodedArrayBuffer;
+            let json;
+            let output;
+
+            beforeEach(async () => {
+                [decodedArrayBuffer, json] = await Promise.all([
+                    loadFixtureAsArrayBuffer(`sine-pcm-s16.wav`),
+                    loadFixtureAsJson(`sine-pcm-s16.opus.json`)
+                ]);
+
+                output = stub();
+            });
+
+            // bug #12
+            it('should emit an instance of AudioData with a wrong duration', async () => {
+                const audioEncoder = new AudioEncoder({
+                    error: () => {
+                        throw new Error('This should never be called.');
+                    },
+                    output
+                });
+
+                audioEncoder.configure(json.config);
+                json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
+                    audioEncoder.encode(
+                        new AudioData({
+                            data: decodedArrayBuffer.slice(...data),
+                            format: 's16',
+                            numberOfChannels: json.config.numberOfChannels,
+                            numberOfFrames,
+                            sampleRate: json.config.sampleRate,
+                            timestamp
+                        })
+                    );
+
+                    return timestamp + duration;
+                }, 0);
+
+                await audioEncoder.flush();
+
+                for (const call of output.getCalls()) {
+                    const { duration, timestamp } = call.args[0];
+
+                    if ([240000, 500000, 1020000, 2040000, 4080000].includes(timestamp)) {
+                        expect(duration).to.equal(19999);
+                    } else if ([259999, 519999, 1039999, 2079999, 4179999].includes(timestamp)) {
+                        expect(duration).to.equal(20001);
+                    } else {
+                        expect(duration).to.equal(20000);
+                    }
+                }
+            });
+
+            // bug #13
+            it('should emit an instance of AudioData with a wrong timestamp', async () => {
+                const audioEncoder = new AudioEncoder({
+                    error: () => {
+                        throw new Error('This should never be called.');
+                    },
+                    output
+                });
+
+                audioEncoder.configure(json.config);
+                json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
+                    audioEncoder.encode(
+                        new AudioData({
+                            data: decodedArrayBuffer.slice(...data),
+                            format: 's16',
+                            numberOfChannels: json.config.numberOfChannels,
+                            numberOfFrames,
+                            sampleRate: json.config.sampleRate,
+                            timestamp
+                        })
+                    );
+
+                    return timestamp + duration;
+                }, 0);
+
+                await audioEncoder.flush();
+
+                output.getCalls().reduce((timestamp, call, index) => {
+                    if ([260000, 520000, 1040000, 2060000, 2080000, 4100000, 4120000, 4140000, 4160000, 4180000].includes(timestamp)) {
+                        expect(call.args[0].timestamp).to.equal(timestamp - 1);
+                    } else {
+                        expect(call.args[0].timestamp).to.equal(timestamp);
+                    }
+
+                    return timestamp + json.encodedAudioChunks[index].duration;
+                }, 0);
             });
         });
     });

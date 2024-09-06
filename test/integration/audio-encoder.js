@@ -863,25 +863,8 @@ describe('AudioEncoder', () => {
                                     expect(encodedAudioChunk.byteLength).to.equal(byteLength);
                                 }
 
-                                if (codec === 'opus' && encodedAudioChunk.duration === 19999) {
-                                    expect(encodedAudioChunk.duration).to.equal(duration - 1);
-                                } else if (codec === 'opus' && encodedAudioChunk.duration === 20001) {
-                                    expect(encodedAudioChunk.duration).to.equal(duration + 1);
-                                } else {
-                                    expect(encodedAudioChunk.duration).to.equal(duration);
-                                }
-
-                                if (
-                                    codec === 'opus' &&
-                                    [259999, 519999, 1039999, 2059999, 2079999, 4099999, 4119999, 4139999, 4159999, 4179999].includes(
-                                        encodedAudioChunk.timestamp
-                                    )
-                                ) {
-                                    expect(encodedAudioChunk.timestamp).to.equal(timestamp - 1);
-                                } else {
-                                    expect(encodedAudioChunk.timestamp).to.equal(timestamp);
-                                }
-
+                                expect(encodedAudioChunk.duration).to.equal(duration);
+                                expect(encodedAudioChunk.timestamp).to.equal(timestamp);
                                 expect(encodedAudioChunk.type).to.equal(type);
 
                                 // eslint-disable-next-line no-undef
@@ -907,7 +890,7 @@ describe('AudioEncoder', () => {
                                     });
                                 }
 
-                                return timestamp + duration;
+                                return (timestamp + duration).toString().endsWith('999') ? timestamp + duration + 1 : timestamp + duration;
                             }, 0);
                         });
                     });

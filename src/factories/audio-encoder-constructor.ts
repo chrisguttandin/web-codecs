@@ -26,7 +26,38 @@ export const createAudioEncoderConstructor = (
 
             // Bug #6: AudioEncoder is not yet implemented in Firefox and Safari.
             this.#internalAudioEncoder =
-                nativeAudioEncoderConstructor === null ? new fakeAudioEncoderConstructor(init) : new nativeAudioEncoderConstructor(init);
+                nativeAudioEncoderConstructor === null
+                    ? new fakeAudioEncoderConstructor(init)
+                    : new nativeAudioEncoderConstructor({
+                          ...init,
+                          ...(typeof init.output === 'function'
+                              ? {
+                                    output: (encodedAudioChunk, ...args) => {
+                                        const { duration } = encodedAudioChunk;
+
+                                        // Bug #12: Chrome sometimes gets the duration slightly wrong.
+                                        if (duration !== null) {
+                                            const stringifiedDuration = duration.toString();
+
+                                            if (/001|334$/.test(stringifiedDuration)) {
+                                                Object.defineProperty(encodedAudioChunk, 'duration', { get: () => duration - 1 });
+                                            } else if (/999$/.test(stringifiedDuration)) {
+                                                Object.defineProperty(encodedAudioChunk, 'duration', { get: () => duration + 1 });
+                                            }
+                                        }
+
+                                        // Bug #13: Chrome sometimes gets the timestamp slightly wrong.
+                                        if (encodedAudioChunk.timestamp.toString().endsWith('999')) {
+                                            const timestamp = encodedAudioChunk.timestamp + 1;
+
+                                            Object.defineProperty(encodedAudioChunk, 'timestamp', { get: () => timestamp });
+                                        }
+
+                                        init.output(encodedAudioChunk, ...args);
+                                    }
+                                }
+                              : {})
+                      });
             this.#ondequeue = null;
         }
 
