@@ -1278,7 +1278,7 @@ describe('AudioData', () => {
                 let s32Planes;
 
                 beforeEach(() => {
-                    u8InterleavedData = new Uint8Array(Array.from({ length: 10 }, () => Math.floor(Math.random() * 256)));
+                    u8InterleavedData = new Uint8Array([0, 128, 255, ...Array.from({ length: 7 }, () => Math.floor(Math.random() * 256))]);
                     f32InterleavedData = new Float32Array(Array.from(u8InterleavedData).map((value) => convertUint8ToFloat32(value)));
                     f32Planes = extractPlanes(f32InterleavedData);
                     s16InterleavedData = new Int16Array(Array.from(u8InterleavedData).map((value) => convertUint8ToInt16(value)));
@@ -1583,7 +1583,12 @@ describe('AudioData', () => {
                 let s32Planes;
 
                 beforeEach(() => {
-                    s16InterleavedData = new Int16Array(Array.from({ length: 10 }, () => Math.floor(Math.random() * 65536) - 32768));
+                    s16InterleavedData = new Int16Array([
+                        -32768,
+                        0,
+                        32767,
+                        ...Array.from({ length: 7 }, () => Math.floor(Math.random() * 65536) - 32768)
+                    ]);
                     f32InterleavedData = new Float32Array(Array.from(s16InterleavedData).map((value) => convertInt16ToFloat32(value)));
                     f32Planes = extractPlanes(f32InterleavedData);
                     s16Planes = extractPlanes(s16InterleavedData);
@@ -1888,9 +1893,12 @@ describe('AudioData', () => {
                 let s32Planes;
 
                 beforeEach(() => {
-                    s32InterleavedData = new Int32Array(
-                        Array.from({ length: 10 }, () => Math.floor(Math.random() * 4294967296) - 2147483648)
-                    );
+                    s32InterleavedData = new Int32Array([
+                        -2147483648,
+                        0,
+                        2147483647,
+                        ...Array.from({ length: 7 }, () => Math.floor(Math.random() * 4294967296) - 2147483648)
+                    ]);
                     f32InterleavedData = new Float32Array(Array.from(s32InterleavedData).map((value) => convertInt32ToFloat32(value)));
                     f32Planes = extractPlanes(f32InterleavedData);
                     s16InterleavedData = new Int16Array(Array.from(s32InterleavedData).map((value) => convertInt32ToInt16(value)));
@@ -2195,7 +2203,7 @@ describe('AudioData', () => {
                 let s32Planes;
 
                 beforeEach(() => {
-                    f32InterleavedData = new Float32Array(Array.from({ length: 10 }, () => Math.random() * 2 - 1));
+                    f32InterleavedData = new Float32Array([-1, 0, 1, ...Array.from({ length: 7 }, () => Math.random() * 2 - 1)]);
                     f32Planes = extractPlanes(f32InterleavedData);
                     s16InterleavedData = new Int16Array(Array.from(f32InterleavedData).map((value) => convertFloat32ToInt16(value)));
                     s16Planes = extractPlanes(s16InterleavedData);
