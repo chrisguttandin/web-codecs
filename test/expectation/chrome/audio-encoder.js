@@ -1,6 +1,6 @@
-import { spy, stub } from 'sinon';
 import { loadFixtureAsArrayBuffer } from '../../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../../helpers/load-fixture-as-json';
+import { spy } from 'sinon';
 
 describe('AudioEncoder', () => {
     describe('isConfigSupported()', () => {
@@ -143,26 +143,16 @@ describe('AudioEncoder', () => {
         describe('with an opus file', () => {
             let decodedArrayBuffer;
             let json;
-            let output;
 
             beforeEach(async () => {
                 [decodedArrayBuffer, json] = await Promise.all([
                     loadFixtureAsArrayBuffer(`sine-pcm-s16.wav`),
                     loadFixtureAsJson(`sine-pcm-s16.opus.json`)
                 ]);
-
-                output = stub();
             });
 
             // bug #12
             it('should emit an instance of AudioData with a wrong duration', async () => {
-                const audioEncoder = new AudioEncoder({
-                    error: () => {
-                        throw new Error('This should never be called.');
-                    },
-                    output
-                });
-
                 audioEncoder.configure(json.config);
                 json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                     audioEncoder.encode(
@@ -196,13 +186,6 @@ describe('AudioEncoder', () => {
 
             // bug #13
             it('should emit an instance of AudioData with a wrong timestamp', async () => {
-                const audioEncoder = new AudioEncoder({
-                    error: () => {
-                        throw new Error('This should never be called.');
-                    },
-                    output
-                });
-
                 audioEncoder.configure(json.config);
                 json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                     audioEncoder.encode(
