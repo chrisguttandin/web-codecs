@@ -3,6 +3,79 @@ import { loadFixtureAsJson } from '../../../helpers/load-fixture-as-json';
 import { stub } from 'sinon';
 
 describe('AudioDecoder', () => {
+    describe('with a flac file', () => {
+        // bug #19
+
+        let encodedArrayBuffer;
+        let error;
+        let json;
+
+        beforeEach(async () => {
+            [encodedArrayBuffer, json] = await Promise.all([
+                loadFixtureAsArrayBuffer(`sine-flac.flac`),
+                loadFixtureAsJson(`sine-flac.flac.json`)
+            ]);
+
+            error = stub();
+        });
+
+        it('should trigger an EncodingError', async () => {
+            // eslint-disable-next-line no-undef
+            const { supported } = await AudioDecoder.isConfigSupported({
+                ...json.config,
+                description: encodedArrayBuffer.slice(...json.config.description)
+            });
+
+            expect(supported).to.be.true;
+
+            // eslint-disable-next-line no-undef
+            const audioDecoder = new AudioDecoder({
+                error,
+                output: () => {
+                    throw new Error('This should never be called.');
+                }
+            });
+
+            audioDecoder.configure({
+                ...json.config,
+                description: encodedArrayBuffer.slice(...json.config.description)
+            });
+
+            json.encodedAudioChunks.reduce((timestamp, { data, duration }) => {
+                audioDecoder.decode(
+                    // eslint-disable-next-line no-undef
+                    new EncodedAudioChunk({
+                        data: encodedArrayBuffer.slice(...data),
+                        duration,
+                        timestamp,
+                        type: 'key'
+                    })
+                );
+
+                return timestamp + duration;
+            }, 0);
+
+            try {
+                await audioDecoder.flush();
+            } catch (err) {
+                expect(err.code).to.equal(0);
+                expect(err.name).to.equal('EncodingError');
+            }
+
+            expect(error).to.have.been.calledOnce;
+
+            const calls = error.getCalls();
+
+            expect(calls.length).to.equal(1);
+
+            const { args } = calls[0];
+
+            expect(args.length).to.equal(1);
+            expect(args[0].code).to.equal(0);
+            expect(args[0].name).to.equal('EncodingError');
+        });
+    });
+
     describe('with an mp4 file', () => {
         // bug #11
 

@@ -9,13 +9,21 @@ import {
 import { TEventHandler, TNativeCodecState } from '../types';
 import type { createFakeAudioDecoderConstructor } from './fake-audio-decoder-constructor';
 import type { createNativeAudioDecoderConstructor } from './native-audio-decoder-constructor';
+import type { createTestFlacDecodingSupport } from './test-flac-decoding-support';
 
 export const createAudioDecoderConstructor = (
     fakeAudioDecoderConstructor: ReturnType<typeof createFakeAudioDecoderConstructor>,
     nativeAudioDecoderConstructor: ReturnType<typeof createNativeAudioDecoderConstructor>,
-    nativeEncodedAudioChunks: WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>
+    nativeEncodedAudioChunks: WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>,
+    testFlacDecodingSupport: ReturnType<typeof createTestFlacDecodingSupport>
 ): IAudioDecoderConstructor => {
     return class AudioDecoder extends EventTarget implements INativeAudioDecoder {
+        // tslint:disable-next-line:member-access
+        static #isSupportingFlacDecodingPromise = testFlacDecodingSupport();
+
+        // tslint:disable-next-line:member-access
+        #init: INativeAudioDecoderInit;
+
         // tslint:disable-next-line:member-access
         #internalAudioDecoder: Omit<INativeAudioDecoder, 'ondequeue'>;
 
@@ -28,6 +36,7 @@ export const createAudioDecoderConstructor = (
         constructor(init: INativeAudioDecoderInit) {
             super();
 
+            this.#init = init;
             // Bug #5: AudioDecoder is not yet implemented in Firefox and Safari.
             this.#internalAudioDecoder =
                 nativeAudioDecoderConstructor === null
@@ -87,7 +96,18 @@ export const createAudioDecoderConstructor = (
         }
 
         public configure(config: INativeAudioDecoderConfig): void {
-            return this.#internalAudioDecoder.configure(config);
+            this.#internalAudioDecoder.configure(config);
+
+            if (nativeAudioDecoderConstructor !== null && config.codec === 'flac') {
+                AudioDecoder.#isSupportingFlacDecodingPromise.then((isSupportingFlacDecoding) => {
+                    if (!isSupportingFlacDecoding && this.#internalAudioDecoder.state === 'configured') {
+                        this.#internalAudioDecoder.close();
+                        this.#init.error(new DOMException("Failed to execute 'configure' on 'AudioDecoder'.", 'NotSupportedError'));
+                    }
+                });
+            }
+
+            return;
         }
 
         public decode(chunk: INativeEncodedAudioChunk): void {
@@ -107,7 +127,15 @@ export const createAudioDecoderConstructor = (
         public static isConfigSupported(config: INativeAudioDecoderConfig): Promise<INativeAudioDecoderSupport> {
             return nativeAudioDecoderConstructor === null
                 ? fakeAudioDecoderConstructor.isConfigSupported(config)
-                : nativeAudioDecoderConstructor.isConfigSupported(config);
+                : // Bug #19: Firefox v131 is not supporting FLAC.
+                  config.codec === 'flac'
+                  ? Promise.all([
+                        nativeAudioDecoderConstructor.isConfigSupported(config),
+                        AudioDecoder.#isSupportingFlacDecodingPromise
+                    ]).then(([audioDecoderSupport, isSupportingFlacDecoding]) =>
+                        isSupportingFlacDecoding ? audioDecoderSupport : { ...audioDecoderSupport, supported: false }
+                    )
+                  : nativeAudioDecoderConstructor.isConfigSupported(config);
         }
     };
 };

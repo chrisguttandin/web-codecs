@@ -12,6 +12,7 @@ import { createNativeAudioDataConstructor } from './factories/native-audio-data-
 import { createNativeAudioDecoderConstructor } from './factories/native-audio-decoder-constructor';
 import { createNativeAudioEncoderConstructor } from './factories/native-audio-encoder-constructor';
 import { createNativeEncodedAudioChunkConstructor } from './factories/native-encoded-audio-chunk-constructor';
+import { createTestFlacDecodingSupport } from './factories/test-flac-decoding-support';
 import { createWindow } from './factories/window';
 import { computeCopyElementCount } from './functions/compute-copy-element-count';
 import { convertBufferSourceToTypedArray } from './functions/convert-buffer-source-to-typed-array';
@@ -74,7 +75,8 @@ const nativeEncodedAudioChunks = new WeakMap<INativeEncodedAudioChunk, INativeEn
 const audioDecoderConstructor = createAudioDecoderConstructor(
     fakeAudioDecoderConstructor,
     nativeAudioDecoderConstructor,
-    nativeEncodedAudioChunks
+    nativeEncodedAudioChunks,
+    createTestFlacDecodingSupport(nativeAudioDecoderConstructor)
 );
 
 export { audioDecoderConstructor as AudioDecoder };
