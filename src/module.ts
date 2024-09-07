@@ -58,7 +58,12 @@ const fakeAudioDataConstructor = createFakeAudioDataConstructor(
 const window = createWindow();
 const nativeAudioDataConstructor = createNativeAudioDataConstructor(window);
 const nativeAudioDatas = new WeakMap<INativeAudioData, INativeAudioData>();
-const audioDataConstructor = createAudioDataConstructor(fakeAudioDataConstructor, nativeAudioDataConstructor, nativeAudioDatas);
+const audioDataConstructor = createAudioDataConstructor(
+    detachArrayBuffer,
+    fakeAudioDataConstructor,
+    nativeAudioDataConstructor,
+    nativeAudioDatas
+);
 
 export { audioDataConstructor as AudioData };
 
@@ -83,6 +88,7 @@ export { audioEncoderConstructor as AudioEncoder };
 const fakeEncodedAudioChunkConstructor = createFakeEncodedAudioChunkConstructor(convertBufferSourceToTypedArray, detachArrayBuffer);
 const nativeEncodedAudioChunkConstructor = createNativeEncodedAudioChunkConstructor(window);
 const encodedAudioChunkConstructor = createEncodedAudioChunkConstructor(
+    detachArrayBuffer,
     fakeEncodedAudioChunkConstructor,
     nativeEncodedAudioChunkConstructor,
     nativeEncodedAudioChunks

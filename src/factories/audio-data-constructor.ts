@@ -1,9 +1,11 @@
+import type { detachArrayBuffer as detachArrayBufferFunction } from '../functions/detach-array-buffer';
 import { INativeAudioData, INativeAudioDataCopyToOptions, INativeAudioDataInit } from '../interfaces';
 import { TNativeAudioDataConstructor, TNativeAudioSampleFormat } from '../types';
 import type { createFakeAudioDataConstructor } from './fake-audio-data-constructor';
 import type { createNativeAudioDataConstructor } from './native-audio-data-constructor';
 
 export const createAudioDataConstructor = (
+    detachArrayBuffer: typeof detachArrayBufferFunction,
     fakeAudioDataConstructor: ReturnType<typeof createFakeAudioDataConstructor>,
     nativeAudioDataConstructor: ReturnType<typeof createNativeAudioDataConstructor>,
     nativeAudioDatas: WeakMap<INativeAudioData, INativeAudioData>
@@ -46,6 +48,22 @@ export const createAudioDataConstructor = (
                     }
 
                     throw err;
+                }
+
+                if (initOrSymbol.transfer !== undefined) {
+                    // Bug #14: Firefox is ignoring multiple references to the same ArrayBuffer.
+                    if (initOrSymbol.transfer.length !== new Set(initOrSymbol.transfer).size) {
+                        throw new DOMException("Failed to construct 'AudioData'.", 'DataCloneError');
+                    }
+
+                    // Bug #15: Firefox does not detach the ArrayBuffer.
+                    if (initOrSymbol.data.byteLength > 0) {
+                        const arrayBuffer = initOrSymbol.data instanceof ArrayBuffer ? initOrSymbol.data : initOrSymbol.data.buffer;
+
+                        if (initOrSymbol.transfer.includes(arrayBuffer)) {
+                            detachArrayBuffer(arrayBuffer);
+                        }
+                    }
                 }
             }
 
