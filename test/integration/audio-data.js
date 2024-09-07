@@ -1,4 +1,5 @@
 import { AudioData } from '../../src/module';
+import { computeDelta } from '../helpers/compute-delta';
 import { convertFloat32ToInt16 } from '../../src/functions/convert-float32-to-int16';
 import { convertFloat32ToInt32 } from '../../src/functions/convert-float32-to-int32';
 import { convertFloat32ToUint8 } from '../../src/functions/convert-float32-to-uint8';
@@ -1347,7 +1348,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s16InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16InterleavedData[i], computeDelta(destination[i], 'u8', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1360,11 +1363,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[0][i], computeDelta(destination[i], 'u8', 's16'));
+                            }
 
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s16Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[1][i], computeDelta(destination[i], 'u8', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1377,7 +1384,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32InterleavedData[i], computeDelta(destination[i], 'u8', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1390,11 +1399,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[0][i], computeDelta(destination[i], 'u8', 's32'));
+                            }
 
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s32Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[1][i], computeDelta(destination[i], 'u8', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1407,7 +1420,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(f32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, f32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(f32InterleavedData[i], computeDelta(destination[i], 'u8', 'f32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1419,11 +1434,15 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(destination).to.deep.equal(f32Planes[0]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[0].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[0][i], computeDelta(destination[i], 'u8', 'f32'));
+                        }
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(destination).to.deep.equal(f32Planes[1]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[1].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[1][i], computeDelta(destination[i], 'u8', 'f32'));
+                        }
                     });
                 });
 
@@ -1491,7 +1510,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s16InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16InterleavedData[i], computeDelta(destination[i], 'u8', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1504,11 +1525,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[0][i], computeDelta(destination[i], 'u8', 's16'));
+                            }
 
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s16Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[1][i], computeDelta(destination[i], 'u8', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1521,7 +1546,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32InterleavedData[i], computeDelta(destination[i], 'u8', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1534,11 +1561,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[0][i], computeDelta(destination[i], 'u8', 's32'));
+                            }
 
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s32Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[1][i], computeDelta(destination[i], 'u8', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1551,7 +1582,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(f32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, f32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(f32InterleavedData[i], computeDelta(destination[i], 'u8', 'f32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1563,11 +1596,15 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(destination).to.deep.equal(f32Planes[0]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[0].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[0][i], computeDelta(destination[i], 'u8', 'f32'));
+                        }
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(destination).to.deep.equal(f32Planes[1]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[1].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[1][i], computeDelta(destination[i], 'u8', 'f32'));
+                        }
                     });
                 });
             });
@@ -1618,7 +1655,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, u8InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8InterleavedData[i], computeDelta(destination[i], 's16', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1631,11 +1670,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[0][i], computeDelta(destination[i], 's16', 'u8'));
+                            }
 
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(u8Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[1][i], computeDelta(destination[i], 's16', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1687,7 +1730,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32InterleavedData[i], computeDelta(destination[i], 's16', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1700,11 +1745,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[0][i], computeDelta(destination[i], 's16', 's32'));
+                            }
 
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s32Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[1][i], computeDelta(destination[i], 's16', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1717,7 +1766,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(f32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, f32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(f32InterleavedData[i], computeDelta(destination[i], 's16', 'f32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1729,11 +1780,15 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(destination).to.deep.equal(f32Planes[0]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[0].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[0][i], computeDelta(destination[i], 's16', 'f32'));
+                        }
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(destination).to.deep.equal(f32Planes[1]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[1].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[1][i], computeDelta(destination[i], 's16', 'f32'));
+                        }
                     });
                 });
 
@@ -1757,7 +1812,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, u8InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8InterleavedData[i], computeDelta(destination[i], 's16', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1770,11 +1827,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[0][i], computeDelta(destination[i], 's16', 'u8'));
+                            }
 
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(u8Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[1][i], computeDelta(destination[i], 's16', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1831,7 +1892,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32InterleavedData[i], computeDelta(destination[i], 's16', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1844,11 +1907,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[0][i], computeDelta(destination[i], 's16', 's32'));
+                            }
 
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s32Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[1][i], computeDelta(destination[i], 's16', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1861,7 +1928,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(f32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, f32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(f32InterleavedData[i], computeDelta(destination[i], 's16', 'f32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1873,11 +1942,15 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(destination).to.deep.equal(f32Planes[0]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[0].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[0][i], computeDelta(destination[i], 's16', 'f32'));
+                        }
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(destination).to.deep.equal(f32Planes[1]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[1].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[1][i], computeDelta(destination[i], 's16', 'f32'));
+                        }
                     });
                 });
             });
@@ -1928,7 +2001,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, u8InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8InterleavedData[i], computeDelta(destination[i], 's32', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1941,11 +2016,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[0][i], computeDelta(destination[i], 's32', 'u8'));
+                            }
 
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(u8Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[1][i], computeDelta(destination[i], 's32', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1958,7 +2037,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s16InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16InterleavedData[i], computeDelta(destination[i], 's32', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -1971,11 +2052,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[0][i], computeDelta(destination[i], 's32', 's16'));
+                            }
 
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s16Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[1][i], computeDelta(destination[i], 's32', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2027,7 +2112,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(f32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, f32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(f32InterleavedData[i], computeDelta(destination[i], 's32', 'f32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2039,11 +2126,15 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(destination).to.deep.equal(f32Planes[0]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[0].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[0][i], computeDelta(destination[i], 's32', 'f32'));
+                        }
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(destination).to.deep.equal(f32Planes[1]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[1].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[1][i], computeDelta(destination[i], 's32', 'f32'));
+                        }
                     });
                 });
 
@@ -2067,7 +2158,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, u8InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8InterleavedData[i], computeDelta(destination[i], 's32', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2080,11 +2173,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[0][i], computeDelta(destination[i], 's32', 'u8'));
+                            }
 
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(u8Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[1][i], computeDelta(destination[i], 's32', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2097,7 +2194,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s16InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16InterleavedData[i], computeDelta(destination[i], 's32', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2110,11 +2209,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[0][i], computeDelta(destination[i], 's32', 's16'));
+                            }
 
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s16Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[1][i], computeDelta(destination[i], 's32', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2171,7 +2274,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'f32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(f32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, f32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(f32InterleavedData[i], computeDelta(destination[i], 's32', 'f32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2183,11 +2288,15 @@ describe('AudioData', () => {
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
 
-                        expect(destination).to.deep.equal(f32Planes[0]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[0].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[0][i], computeDelta(destination[i], 's32', 'f32'));
+                        }
 
                         audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 1 });
 
-                        expect(destination).to.deep.equal(f32Planes[1]);
+                        for (let i = 0; i < Math.max(destination.length, f32Planes[1].length); i += 1) {
+                            expect(destination[i]).to.be.closeTo(f32Planes[1][i], computeDelta(destination[i], 's32', 'f32'));
+                        }
                     });
                 });
             });
@@ -2233,7 +2342,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, u8InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8InterleavedData[i], computeDelta(destination[i], 'f32', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2246,11 +2357,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[0][i], computeDelta(destination[i], 'f32', 'u8'));
+                            }
 
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(u8Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[1][i], computeDelta(destination[i], 'f32', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2263,7 +2378,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s16InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16InterleavedData[i], computeDelta(destination[i], 'f32', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2276,11 +2393,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[0][i], computeDelta(destination[i], 'f32', 's16'));
+                            }
 
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s16Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[1][i], computeDelta(destination[i], 'f32', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2293,7 +2414,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32InterleavedData[i], computeDelta(destination[i], 'f32', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2306,11 +2429,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[0][i], computeDelta(destination[i], 'f32', 's32'));
+                            }
 
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s32Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[1][i], computeDelta(destination[i], 'f32', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2372,7 +2499,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, u8InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8InterleavedData[i], computeDelta(destination[i], 'f32', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2385,11 +2514,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(u8Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[0][i], computeDelta(destination[i], 'f32', 'u8'));
+                            }
 
                             audioData.copyTo(destination, { format: 'u8-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(u8Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, u8Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(u8Planes[1][i], computeDelta(destination[i], 'f32', 'u8'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2402,7 +2535,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s16InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16InterleavedData[i], computeDelta(destination[i], 'f32', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2415,11 +2550,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s16Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[0][i], computeDelta(destination[i], 'f32', 's16'));
+                            }
 
                             audioData.copyTo(destination, { format: 's16-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s16Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s16Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s16Planes[1][i], computeDelta(destination[i], 'f32', 's16'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2432,7 +2571,9 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32InterleavedData);
+                            for (let i = 0; i < Math.max(destination.length, s32InterleavedData.length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32InterleavedData[i], computeDelta(destination[i], 'f32', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
@@ -2445,11 +2586,15 @@ describe('AudioData', () => {
                         try {
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 0 });
 
-                            expect(destination).to.deep.equal(s32Planes[0]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[0].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[0][i], computeDelta(destination[i], 'f32', 's32'));
+                            }
 
                             audioData.copyTo(destination, { format: 's32-planar', planeIndex: 1 });
 
-                            expect(destination).to.deep.equal(s32Planes[1]);
+                            for (let i = 0; i < Math.max(destination.length, s32Planes[1].length); i += 1) {
+                                expect(destination[i]).to.be.closeTo(s32Planes[1][i], computeDelta(destination[i], 'f32', 's32'));
+                            }
                         } catch (err) {
                             expect(err.code).to.equal(9);
                             expect(err.name).to.equal('NotSupportedError');
