@@ -156,6 +156,7 @@ describe('AudioEncoder', () => {
                 audioEncoder.configure(json.config);
                 json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                     audioEncoder.encode(
+                        // eslint-disable-next-line no-undef
                         new AudioData({
                             data: decodedArrayBuffer.slice(...data),
                             format: 's16',
@@ -189,6 +190,7 @@ describe('AudioEncoder', () => {
                 audioEncoder.configure(json.config);
                 json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                     audioEncoder.encode(
+                        // eslint-disable-next-line no-undef
                         new AudioData({
                             data: decodedArrayBuffer.slice(...data),
                             format: 's16',

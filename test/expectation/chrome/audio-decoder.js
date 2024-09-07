@@ -20,6 +20,7 @@ describe('AudioDecoder', () => {
         });
 
         it('should emit an instance of AudioData with a wrong timestamp', async () => {
+            // eslint-disable-next-line no-undef
             const audioDecoder = new AudioDecoder({
                 error: () => {
                     throw new Error('This should never be called.');
@@ -33,6 +34,7 @@ describe('AudioDecoder', () => {
             });
             json.encodedAudioChunks.reduce((timestamp, { data, duration }) => {
                 audioDecoder.decode(
+                    // eslint-disable-next-line no-undef
                     new EncodedAudioChunk({
                         data: encodedArrayBuffer.slice(...data),
                         duration,
