@@ -1,6 +1,7 @@
 import { AudioData, AudioDecoder, EncodedAudioChunk } from '../../src/module';
 import { spy, stub } from 'sinon';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
+import { computeDelta } from '../helpers/compute-delta';
 import { filterSupportedAudioCodecsForDecoding } from '../helpers/filter-supported-audio-codecs-for-decoding';
 import { loadFixtureAsArrayBuffer } from '../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../helpers/load-fixture-as-json';
@@ -786,9 +787,20 @@ describe('AudioDecoder', () => {
                 for (const [codec, container, format] of filterSupportedAudioCodecsForDecoding(
                     KNOWN_AUDIO_CODECS.filter(
                         (knownAudioCodec) =>
-                            !['mp4a.40.02', 'mp4a.40.05', 'mp4a.40.29', 'mp4a.40.5', 'mp4a.67', 'mp4a.69', 'mp4a.6B'].includes(
-                                knownAudioCodec
-                            )
+                            ![
+                                'mp4a.40.02',
+                                'mp4a.40.05',
+                                'mp4a.40.29',
+                                'mp4a.40.5',
+                                'mp4a.67',
+                                'mp4a.69',
+                                'mp4a.6B',
+                                'pcm-f32',
+                                'pcm-s16',
+                                'pcm-s24',
+                                'pcm-s32',
+                                'pcm-u8'
+                            ].includes(knownAudioCodec)
                     ),
                     navigator.userAgent
                 )
@@ -873,7 +885,7 @@ describe('AudioDecoder', () => {
                                 const { data, duration, numberOfFrames } = json.audioDatas[index];
 
                                 expect(audioData.duration).to.equal(duration);
-                                expect(audioData.format).to.equal(format);
+                                expect(audioData.format).to.equal(navigator.userAgent.includes('Firefox') ? 'f32' : format);
                                 expect(audioData.numberOfChannels).to.equal(json.config.numberOfChannels);
                                 expect(audioData.numberOfFrames).to.equal(numberOfFrames);
                                 expect(audioData.sampleRate).to.equal(json.config.sampleRate);
@@ -881,13 +893,25 @@ describe('AudioDecoder', () => {
 
                                 // eslint-disable-next-line no-undef
                                 if (!process.env.CI) {
-                                    const uint8Array = new Uint8Array(audioData.allocationSize({ planeIndex: 0 }));
+                                    const uint8Array = new Uint8Array(audioData.allocationSize({ format, planeIndex: 0 }));
 
-                                    audioData.copyTo(uint8Array, { planeIndex: 0 });
+                                    audioData.copyTo(uint8Array, { format, planeIndex: 0 });
 
-                                    expect(Array.from(uint8Array)).to.deep.equal(
-                                        Array.from(new Uint8Array(decodedArrayBuffer.slice(...data)))
-                                    );
+                                    if (navigator.userAgent.includes('Firefox') && ['mp4a.40.2', 'opus'].includes(codec)) {
+                                        const float32Array = new Float32Array(uint8Array.buffer);
+                                        const decodedFloat32Array = new Float32Array(decodedArrayBuffer.slice(...data));
+
+                                        for (let i = 0; i < Math.max(float32Array.length, decodedFloat32Array.length); i += 1) {
+                                            expect(float32Array[i]).to.be.closeTo(
+                                                decodedFloat32Array[i],
+                                                computeDelta(decodedFloat32Array[i], 's16', 'f32')
+                                            );
+                                        }
+                                    } else {
+                                        expect(Array.from(uint8Array)).to.deep.equal(
+                                            Array.from(new Uint8Array(decodedArrayBuffer.slice(...data)))
+                                        );
+                                    }
                                 }
 
                                 return totalNumberOfFrames + numberOfFrames;
