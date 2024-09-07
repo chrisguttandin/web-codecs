@@ -18,7 +18,15 @@ module.exports = (config) => {
 
         concurrency: 1,
 
-        files: ['test/expectation/firefox/current/**/*.js'],
+        files: [
+            {
+                included: false,
+                pattern: 'test/fixtures/**',
+                served: true,
+                watched: true
+            },
+            'test/expectation/firefox/current/**/*.js'
+        ],
 
         frameworks: ['mocha', 'sinon-chai'],
 
