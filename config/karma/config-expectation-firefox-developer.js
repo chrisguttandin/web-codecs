@@ -9,6 +9,8 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 100000,
 
+        browsers: ['FirefoxDeveloperHeadless'],
+
         client: {
             mocha: {
                 bail: true,
@@ -18,12 +20,20 @@ module.exports = (config) => {
 
         concurrency: 1,
 
-        files: ['test/expectation/firefox/current/**/*.js'],
+        files: [
+            {
+                included: false,
+                pattern: 'test/fixtures/**',
+                served: true,
+                watched: true
+            },
+            'test/expectation/firefox/developer/**/*.js'
+        ],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            'test/expectation/firefox/current/**/*.js': 'webpack'
+            'test/expectation/firefox/developer/**/*.js': 'webpack'
         },
 
         reporters: ['dots'],
@@ -64,35 +74,5 @@ module.exports = (config) => {
         }
     });
 
-    if (env.CI) {
-        config.set({
-            browserStack: {
-                accessKey: env.BROWSER_STACK_ACCESS_KEY,
-                build: `${env.GITHUB_RUN_ID}/expectation-firefox`,
-                forceLocal: true,
-                localIdentifier: `${Math.floor(Math.random() * 1000000)}`,
-                project: env.GITHUB_REPOSITORY,
-                username: env.BROWSER_STACK_USERNAME,
-                video: false
-            },
-
-            browsers: ['FirefoxBrowserStack'],
-
-            captureTimeout: 300000,
-
-            customLaunchers: {
-                FirefoxBrowserStack: {
-                    base: 'BrowserStack',
-                    browser: 'firefox',
-                    captureTimeout: 300,
-                    os: 'Windows',
-                    os_version: '10' // eslint-disable-line camelcase
-                }
-            }
-        });
-    } else {
-        config.set({
-            browsers: ['FirefoxHeadless']
-        });
-    }
+    env.FIREFOX_DEVELOPER_BIN = '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox';
 };

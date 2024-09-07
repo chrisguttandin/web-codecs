@@ -9,6 +9,8 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 100000,
 
+        browsers: ['PreviousFirefoxHeadless'],
+
         client: {
             mocha: {
                 bail: true,
@@ -18,12 +20,19 @@ module.exports = (config) => {
 
         concurrency: 1,
 
-        files: ['test/expectation/firefox/current/**/*.js'],
+        customLaunchers: {
+            PreviousFirefoxHeadless: {
+                base: 'FirefoxHeadless',
+                command: 'firefox-v128/firefox/Firefox.app/Contents/MacOS/firefox'
+            }
+        },
+
+        files: ['test/expectation/firefox/previous/**/*.js'],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            'test/expectation/firefox/current/**/*.js': 'webpack'
+            'test/expectation/firefox/previous/**/*.js': 'webpack'
         },
 
         reporters: ['dots'],
@@ -63,36 +72,4 @@ module.exports = (config) => {
             noInfo: true
         }
     });
-
-    if (env.CI) {
-        config.set({
-            browserStack: {
-                accessKey: env.BROWSER_STACK_ACCESS_KEY,
-                build: `${env.GITHUB_RUN_ID}/expectation-firefox`,
-                forceLocal: true,
-                localIdentifier: `${Math.floor(Math.random() * 1000000)}`,
-                project: env.GITHUB_REPOSITORY,
-                username: env.BROWSER_STACK_USERNAME,
-                video: false
-            },
-
-            browsers: ['FirefoxBrowserStack'],
-
-            captureTimeout: 300000,
-
-            customLaunchers: {
-                FirefoxBrowserStack: {
-                    base: 'BrowserStack',
-                    browser: 'firefox',
-                    captureTimeout: 300,
-                    os: 'Windows',
-                    os_version: '10' // eslint-disable-line camelcase
-                }
-            }
-        });
-    } else {
-        config.set({
-            browsers: ['FirefoxHeadless']
-        });
-    }
 };
