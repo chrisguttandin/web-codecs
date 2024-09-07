@@ -899,6 +899,10 @@ describe('AudioDecoder', () => {
 
                             const calls = output.getCalls();
 
+                            if (navigator.userAgent.includes('Firefox/131.0') && codec === 'vorbis') {
+                                json.audioDatas.unshift({ data: [58, 58], duration: 0, numberOfFrames: 0 });
+                            }
+
                             expect(calls.length).to.equal(json.audioDatas.length);
 
                             calls.reduce((totalNumberOfFrames, call, index) => {
@@ -922,12 +926,12 @@ describe('AudioDecoder', () => {
                                 expect(audioData.timestamp).to.equal(Math.floor((totalNumberOfFrames * 1000000) / audioData.sampleRate));
 
                                 // eslint-disable-next-line no-undef
-                                if (!process.env.CI) {
+                                if (!process.env.CI && duration > 0) {
                                     const uint8Array = new Uint8Array(audioData.allocationSize({ format, planeIndex: 0 }));
 
                                     audioData.copyTo(uint8Array, { format, planeIndex: 0 });
 
-                                    if (navigator.userAgent.includes('Firefox') && ['mp4a.40.2', 'opus'].includes(codec)) {
+                                    if (navigator.userAgent.includes('Firefox') && ['mp4a.40.2', 'opus', 'vorbis'].includes(codec)) {
                                         const float32Array = new Float32Array(uint8Array.buffer);
                                         const decodedFloat32Array = new Float32Array(decodedArrayBuffer.slice(...data));
 

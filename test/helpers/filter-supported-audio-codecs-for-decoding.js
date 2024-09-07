@@ -56,7 +56,8 @@ export const filterSupportedAudioCodecsForDecoding = (knownAudioCodecs, userAgen
                       'pcm-s24',
                       'pcm-s32',
                       'pcm-u8',
-                      'ulaw'
+                      'ulaw',
+                      'vorbis'
                   ].includes(knownAudioCodec)
               )
             : [];
