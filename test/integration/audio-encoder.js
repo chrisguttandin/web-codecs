@@ -180,6 +180,12 @@ describe('AudioEncoder', () => {
         describe('with valid options', () => {
             let audioEncoder;
 
+            afterEach(() => {
+                if (audioEncoder.state !== 'closed') {
+                    audioEncoder.close();
+                }
+            });
+
             beforeEach(() => {
                 audioEncoder = new AudioEncoder({
                     error,
@@ -233,6 +239,12 @@ describe('AudioEncoder', () => {
     describe('ondequeue', () => {
         let audioEncoder;
 
+        afterEach(() => {
+            if (audioEncoder.state !== 'closed') {
+                audioEncoder.close();
+            }
+        });
+
         beforeEach(() => {
             audioEncoder = new AudioEncoder({
                 error,
@@ -284,6 +296,12 @@ describe('AudioEncoder', () => {
 
     describe('close()', () => {
         let audioEncoder;
+
+        afterEach(() => {
+            if (audioEncoder.state !== 'closed') {
+                audioEncoder.close();
+            }
+        });
 
         beforeEach(() => {
             audioEncoder = new AudioEncoder({
@@ -340,6 +358,12 @@ describe('AudioEncoder', () => {
 
     describe('configure()', () => {
         let audioEncoder;
+
+        afterEach(() => {
+            if (audioEncoder.state !== 'closed') {
+                audioEncoder.close();
+            }
+        });
 
         beforeEach(() => {
             audioEncoder = new AudioEncoder({
@@ -754,6 +778,12 @@ describe('AudioEncoder', () => {
         let audioData;
         let audioEncoder;
 
+        afterEach(() => {
+            if (audioEncoder.state !== 'closed') {
+                audioEncoder.close();
+            }
+        });
+
         beforeEach(() => {
             audioData = new AudioData({
                 data: new Float32Array(10),
@@ -917,6 +947,12 @@ describe('AudioEncoder', () => {
     describe('flush()', () => {
         let audioEncoder;
 
+        afterEach(() => {
+            if (audioEncoder.state !== 'closed') {
+                audioEncoder.close();
+            }
+        });
+
         beforeEach(() => {
             audioEncoder = new AudioEncoder({
                 error,
@@ -971,6 +1007,12 @@ describe('AudioEncoder', () => {
 
     describe('reset()', () => {
         let audioEncoder;
+
+        afterEach(() => {
+            if (audioEncoder.state !== 'closed') {
+                audioEncoder.close();
+            }
+        });
 
         beforeEach(() => {
             audioEncoder = new AudioEncoder({

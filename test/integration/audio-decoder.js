@@ -259,6 +259,12 @@ describe('AudioDecoder', () => {
         describe('with valid options', () => {
             let audioDecoder;
 
+            afterEach(() => {
+                if (audioDecoder.state !== 'closed') {
+                    audioDecoder.close();
+                }
+            });
+
             beforeEach(() => {
                 audioDecoder = new AudioDecoder({
                     error,
@@ -312,6 +318,12 @@ describe('AudioDecoder', () => {
     describe('ondequeue', () => {
         let audioDecoder;
 
+        afterEach(() => {
+            if (audioDecoder.state !== 'closed') {
+                audioDecoder.close();
+            }
+        });
+
         beforeEach(() => {
             audioDecoder = new AudioDecoder({
                 error,
@@ -363,6 +375,12 @@ describe('AudioDecoder', () => {
 
     describe('close()', () => {
         let audioDecoder;
+
+        afterEach(() => {
+            if (audioDecoder.state !== 'closed') {
+                audioDecoder.close();
+            }
+        });
 
         beforeEach(() => {
             audioDecoder = new AudioDecoder({
@@ -435,6 +453,12 @@ describe('AudioDecoder', () => {
 
     describe('configure()', () => {
         let audioDecoder;
+
+        afterEach(() => {
+            if (audioDecoder.state !== 'closed') {
+                audioDecoder.close();
+            }
+        });
 
         beforeEach(() => {
             audioDecoder = new AudioDecoder({
@@ -757,6 +781,12 @@ describe('AudioDecoder', () => {
         let audioDecoder;
         let encodedAudioChunk;
 
+        afterEach(() => {
+            if (audioDecoder.state !== 'closed') {
+                audioDecoder.close();
+            }
+        });
+
         beforeEach(() => {
             audioDecoder = new AudioDecoder({
                 error,
@@ -941,6 +971,12 @@ describe('AudioDecoder', () => {
     describe('flush()', () => {
         let audioDecoder;
 
+        afterEach(() => {
+            if (audioDecoder.state !== 'closed') {
+                audioDecoder.close();
+            }
+        });
+
         beforeEach(() => {
             audioDecoder = new AudioDecoder({
                 error,
@@ -1011,6 +1047,12 @@ describe('AudioDecoder', () => {
 
     describe('reset()', () => {
         let audioDecoder;
+
+        afterEach(() => {
+            if (audioDecoder.state !== 'closed') {
+                audioDecoder.close();
+            }
+        });
 
         beforeEach(() => {
             audioDecoder = new AudioDecoder({
