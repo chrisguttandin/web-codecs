@@ -23,11 +23,19 @@ module.exports = (config) => {
         customLaunchers: {
             PreviousFirefoxHeadless: {
                 base: 'FirefoxHeadless',
-                command: 'firefox-v129/firefox/Firefox.app/Contents/MacOS/firefox'
+                command: 'firefox-v130/firefox/Firefox.app/Contents/MacOS/firefox'
             }
         },
 
-        files: ['test/expectation/firefox/previous/**/*.js'],
+        files: [
+            {
+                included: false,
+                pattern: 'test/fixtures/**',
+                served: true,
+                watched: true
+            },
+            'test/expectation/firefox/previous/**/*.js'
+        ],
 
         frameworks: ['mocha', 'sinon-chai'],
 

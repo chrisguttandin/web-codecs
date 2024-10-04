@@ -899,7 +899,7 @@ describe('AudioDecoder', () => {
 
                             const calls = output.getCalls();
 
-                            if (navigator.userAgent.includes('Firefox/131.0') && codec === 'vorbis') {
+                            if (navigator.userAgent.includes('Firefox') && codec === 'vorbis') {
                                 json.audioDatas.unshift({ data: [58, 58], duration: 0, numberOfFrames: 0 });
                             }
 
