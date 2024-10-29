@@ -17,7 +17,7 @@ export const createEncodedAudioChunkConstructor = (
         constructor(init: INativeEncodedAudioChunkInit) {
             const { byteLength } = init.data;
 
-            // Bug #4: EncodedAudioChunk is not yet implemented in Firefox and Safari.
+            // Bug #4: EncodedAudioChunk is not yet implemented in Safari.
             this.#internalEncodedAudioChunk =
                 nativeEncodedAudioChunkConstructor === null
                     ? new fakeEncodedAudioChunkConstructor(init)

@@ -27,7 +27,7 @@ export const createAudioDataConstructor = (
                 this.#internalAudioData = internalAudioData;
             } else {
                 try {
-                    // Bug #1: AudioData is not yet implemented in Firefox and Safari.
+                    // Bug #1: AudioData is not yet implemented in Safari.
                     this.#internalAudioData =
                         nativeAudioDataConstructor === null
                             ? new fakeAudioDataConstructor(initOrSymbol)

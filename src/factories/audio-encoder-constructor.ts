@@ -24,7 +24,7 @@ export const createAudioEncoderConstructor = (
         constructor(init: INativeAudioEncoderInit) {
             super();
 
-            // Bug #6: AudioEncoder is not yet implemented in Firefox and Safari.
+            // Bug #6: AudioEncoder is not yet implemented in Safari.
             this.#internalAudioEncoder =
                 nativeAudioEncoderConstructor === null
                     ? new fakeAudioEncoderConstructor(init)

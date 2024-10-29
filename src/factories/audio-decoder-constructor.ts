@@ -28,7 +28,7 @@ export const createAudioDecoderConstructor = (
         constructor(init: INativeAudioDecoderInit) {
             super();
 
-            // Bug #5: AudioDecoder is not yet implemented in Firefox and Safari.
+            // Bug #5: AudioDecoder is not yet implemented in Safari.
             this.#internalAudioDecoder =
                 nativeAudioDecoderConstructor === null
                     ? new fakeAudioDecoderConstructor(init)
