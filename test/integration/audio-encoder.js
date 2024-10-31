@@ -169,7 +169,7 @@ describe('AudioEncoder', () => {
 
                             expect(audioEncoderSupport.config).to.not.equal(config);
 
-                            if (/Firefox\/132.0/.test(navigator.userAgent) && ['opus', 'vorbis'].includes(codec)) {
+                            if (/Firefox\/13[23].0/.test(navigator.userAgent) && ['opus', 'vorbis'].includes(codec)) {
                                 expect(audioEncoderSupport).to.deep.equal({ config, supported: !supported });
                             } else {
                                 expect(audioEncoderSupport).to.deep.equal({ config, supported });
@@ -618,7 +618,7 @@ describe('AudioEncoder', () => {
 
                             if (
                                 filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec) ||
-                                (/Firefox\/132.0/.test(navigator.userAgent) && ['opus', 'vorbis'].includes(codec))
+                                (/Firefox\/13[23].0/.test(navigator.userAgent) && ['opus', 'vorbis'].includes(codec))
                             ) {
                                 it('should not trigger a NotSupportedError', async () => {
                                     audioEncoder.configure(config);
