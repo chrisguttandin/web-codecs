@@ -152,7 +152,7 @@ describe('AudioEncoder', () => {
             });
 
             // bug #12
-            it('should emit multiple instances of AudioData with a wrong duration', async () => {
+            it('should emit multiple instances of the AudioData constructor with a wrong duration', async () => {
                 audioEncoder.configure(json.config);
                 json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                     audioEncoder.encode(
@@ -186,7 +186,7 @@ describe('AudioEncoder', () => {
             });
 
             // bug #13
-            it('should emit multiple instances of AudioData with a wrong timestamp', async () => {
+            it('should emit multiple instances of the AudioData constructor with a wrong timestamp', async () => {
                 audioEncoder.configure(json.config);
                 json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                     audioEncoder.encode(

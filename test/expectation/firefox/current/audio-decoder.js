@@ -19,7 +19,7 @@ describe('AudioDecoder', () => {
             output = stub();
         });
 
-        it('should emit multiple instances of AudioData with a wrong timestamp', async () => {
+        it('should emit multiple instances of the AudioData constructor with a wrong timestamp', async () => {
             // eslint-disable-next-line no-undef
             const audioDecoder = new AudioDecoder({
                 error: () => {
