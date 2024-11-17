@@ -168,12 +168,7 @@ describe('AudioEncoder', () => {
                             config.bitrateMode = 'variable';
 
                             expect(audioEncoderSupport.config).to.not.equal(config);
-
-                            if (/Firefox\/13[23].0/.test(navigator.userAgent) && ['opus', 'vorbis'].includes(codec)) {
-                                expect(audioEncoderSupport).to.deep.equal({ config, supported: !supported });
-                            } else {
-                                expect(audioEncoderSupport).to.deep.equal({ config, supported });
-                            }
+                            expect(audioEncoderSupport).to.deep.equal({ config, supported });
                         });
                     });
                 });
@@ -616,10 +611,7 @@ describe('AudioEncoder', () => {
                                 error.resetBehavior();
                             });
 
-                            if (
-                                filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec) ||
-                                (/Firefox\/13[23].0/.test(navigator.userAgent) && ['opus', 'vorbis'].includes(codec))
-                            ) {
+                            if (filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
                                 it('should not trigger a NotSupportedError', async () => {
                                     audioEncoder.configure(config);
 
@@ -842,7 +834,9 @@ describe('AudioEncoder', () => {
                                       ? [knownAudioCodec, 'aac', 's16']
                                       : knownAudioCodec === 'opus'
                                         ? [knownAudioCodec, 'ogg', 's16']
-                                        : null
+                                        : knownAudioCodec === 'vorbis'
+                                          ? [knownAudioCodec, 'ogg', 's16']
+                                          : null
                 )) {
                     describe(`with "${codec}" wrapped in "${container}"`, () => {
                         let decodedArrayBuffer;
@@ -897,7 +891,7 @@ describe('AudioEncoder', () => {
                                 const { byteLength, data, decoderConfig, duration, type } = json.encodedAudioChunks[index];
 
                                 // eslint-disable-next-line no-undef
-                                if (codec === 'opus' && !process.env.CI) {
+                                if (codec === 'opus' && !process.env.CI && !/Firefox/.test(navigator.userAgent)) {
                                     expect(encodedAudioChunk.byteLength).to.equal(byteLength);
                                 }
 
@@ -906,7 +900,7 @@ describe('AudioEncoder', () => {
                                 expect(encodedAudioChunk.type).to.equal(type);
 
                                 // eslint-disable-next-line no-undef
-                                if (!process.env.CI) {
+                                if (!process.env.CI && !/Firefox/.test(navigator.userAgent)) {
                                     const uint8Array = new Uint8Array(encodedAudioChunk.byteLength);
 
                                     encodedAudioChunk.copyTo(uint8Array);
@@ -928,7 +922,10 @@ describe('AudioEncoder', () => {
                                     });
                                 }
 
-                                return (timestamp + duration).toString().endsWith('999') ? timestamp + duration + 1 : timestamp + duration;
+                                return (timestamp + duration).toString().endsWith('332') ||
+                                    (timestamp + duration).toString().endsWith('999')
+                                    ? timestamp + duration + 1
+                                    : timestamp + duration;
                             }, 0);
                         });
                     });

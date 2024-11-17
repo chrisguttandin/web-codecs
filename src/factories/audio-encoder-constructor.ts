@@ -8,13 +8,18 @@ import {
 import { TEventHandler, TNativeAudioEncoderConfig, TNativeCodecState } from '../types';
 import type { createFakeAudioEncoderConstructor } from './fake-audio-encoder-constructor';
 import type { createNativeAudioEncoderConstructor } from './native-audio-encoder-constructor';
+import type { createReadVorbisConfig } from './read-vorbis-config';
 
 export const createAudioEncoderConstructor = (
     fakeAudioEncoderConstructor: ReturnType<typeof createFakeAudioEncoderConstructor>,
     nativeAudioDatas: WeakMap<INativeAudioData, INativeAudioData>,
-    nativeAudioEncoderConstructor: ReturnType<typeof createNativeAudioEncoderConstructor>
+    nativeAudioEncoderConstructor: ReturnType<typeof createNativeAudioEncoderConstructor>,
+    readVorbisConfig: ReturnType<typeof createReadVorbisConfig>
 ): INativeAudioEncoderConstructor => {
     return class AudioEncoder extends EventTarget implements INativeAudioEncoder {
+        // tslint:disable-next-line:member-access
+        #expectedNextTimestamp: number;
+
         // tslint:disable-next-line:member-access
         #internalAudioEncoder: Omit<INativeAudioEncoder, 'ondequeue'>;
 
@@ -24,6 +29,9 @@ export const createAudioEncoderConstructor = (
         constructor(init: INativeAudioEncoderInit) {
             super();
 
+            let vorbisConfig: ReturnType<typeof readVorbisConfig> = null;
+
+            this.#expectedNextTimestamp = 0;
             // Bug #6: AudioEncoder is not yet implemented in Safari.
             this.#internalAudioEncoder =
                 nativeAudioEncoderConstructor === null
@@ -33,16 +41,48 @@ export const createAudioEncoderConstructor = (
                           ...(typeof init.output === 'function'
                               ? {
                                     output: (encodedAudioChunk, ...args) => {
-                                        const { duration } = encodedAudioChunk;
+                                        const description = args[0].decoderConfig?.description;
 
-                                        // Bug #12: Chrome sometimes gets the duration slightly wrong.
-                                        if (duration !== null) {
-                                            const stringifiedDuration = duration.toString();
+                                        if (description !== undefined) {
+                                            vorbisConfig = readVorbisConfig(description);
+                                        }
 
-                                            if (/001|334$/.test(stringifiedDuration)) {
-                                                Object.defineProperty(encodedAudioChunk, 'duration', { get: () => duration - 1 });
-                                            } else if (/999$/.test(stringifiedDuration)) {
-                                                Object.defineProperty(encodedAudioChunk, 'duration', { get: () => duration + 1 });
+                                        if (vorbisConfig === null) {
+                                            const { duration } = encodedAudioChunk;
+
+                                            // Bug #12: Chrome sometimes gets the duration slightly wrong.
+                                            if (duration !== null) {
+                                                const stringifiedDuration = duration.toString();
+
+                                                if (/001|334$/.test(stringifiedDuration)) {
+                                                    Object.defineProperty(encodedAudioChunk, 'duration', { get: () => duration - 1 });
+                                                } else if (/999$/.test(stringifiedDuration)) {
+                                                    Object.defineProperty(encodedAudioChunk, 'duration', { get: () => duration + 1 });
+                                                }
+                                            }
+                                        } else {
+                                            // Bug #21: Firefox computes a wrong duration when encoding as vorbis.
+                                            const uint8Array = new Uint8Array(encodedAudioChunk.byteLength);
+
+                                            encodedAudioChunk.copyTo(uint8Array);
+
+                                            const currentBlockSize =
+                                                vorbisConfig.blocksizes[
+                                                    // tslint:disable-next-line:no-bitwise
+                                                    vorbisConfig.modeBlockflags[(uint8Array[0] >> 1) & vorbisConfig.modeMask]
+                                                ];
+                                            const duration = Math.floor(
+                                                ((vorbisConfig.prevBlockSize === null
+                                                    ? 0
+                                                    : (vorbisConfig.prevBlockSize + currentBlockSize) / 4) /
+                                                    vorbisConfig.sampleRate) *
+                                                    1000000
+                                            );
+
+                                            vorbisConfig.prevBlockSize = currentBlockSize;
+
+                                            if (encodedAudioChunk.duration !== duration) {
+                                                Object.defineProperty(encodedAudioChunk, 'duration', { get: () => duration });
                                             }
                                         }
 
@@ -52,6 +92,15 @@ export const createAudioEncoderConstructor = (
 
                                             Object.defineProperty(encodedAudioChunk, 'timestamp', { get: () => timestamp });
                                         }
+
+                                        // Bug #20: Firefox removes the pre-skip samples when computing the timestamp when encoding as opus.
+                                        if (Math.abs(this.#expectedNextTimestamp - encodedAudioChunk.timestamp) > 1) {
+                                            const timestamp = this.#expectedNextTimestamp;
+
+                                            Object.defineProperty(encodedAudioChunk, 'timestamp', { get: () => timestamp });
+                                        }
+
+                                        this.#expectedNextTimestamp = encodedAudioChunk.timestamp + (encodedAudioChunk.duration ?? 0);
 
                                         init.output(encodedAudioChunk, ...args);
                                     }
@@ -111,6 +160,8 @@ export const createAudioEncoderConstructor = (
         }
 
         public reset(): void {
+            this.#expectedNextTimestamp = 0;
+
             return this.#internalAudioEncoder.reset();
         }
 

@@ -12,6 +12,7 @@ import { createNativeAudioDataConstructor } from './factories/native-audio-data-
 import { createNativeAudioDecoderConstructor } from './factories/native-audio-decoder-constructor';
 import { createNativeAudioEncoderConstructor } from './factories/native-audio-encoder-constructor';
 import { createNativeEncodedAudioChunkConstructor } from './factories/native-encoded-audio-chunk-constructor';
+import { createReadVorbisConfig } from './factories/read-vorbis-config';
 import { createWindow } from './factories/window';
 import { computeCopyElementCount } from './functions/compute-copy-element-count';
 import { convertBufferSourceToTypedArray } from './functions/convert-buffer-source-to-typed-array';
@@ -29,6 +30,7 @@ import { convertUint8ToInt16 } from './functions/convert-uint8-to-int16';
 import { convertUint8ToInt32 } from './functions/convert-uint8-to-int32';
 import { detachArrayBuffer } from './functions/detach-array-buffer';
 import { filterEntries } from './functions/filter-entries';
+import { reverseByte } from './functions/reverse-byte';
 import { INativeAudioData, INativeEncodedAudioChunk } from './interfaces';
 
 /*
@@ -81,7 +83,12 @@ export { audioDecoderConstructor as AudioDecoder };
 
 const fakeAudioEncoderConstructor = createFakeAudioEncoderConstructor(filterEntries, isKnownAudioCodec);
 const nativeAudioEncoderConstructor = createNativeAudioEncoderConstructor(window);
-const audioEncoderConstructor = createAudioEncoderConstructor(fakeAudioEncoderConstructor, nativeAudioDatas, nativeAudioEncoderConstructor);
+const audioEncoderConstructor = createAudioEncoderConstructor(
+    fakeAudioEncoderConstructor,
+    nativeAudioDatas,
+    nativeAudioEncoderConstructor,
+    createReadVorbisConfig(reverseByte)
+);
 
 export { audioEncoderConstructor as AudioEncoder };
 
