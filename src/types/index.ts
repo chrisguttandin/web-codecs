@@ -8,6 +8,8 @@ export * from './native-codec-state';
 export * from './native-encoded-audio-chunk-constructor';
 export * from './native-encoded-audio-chunk-output-callback';
 export * from './native-encoded-audio-chunk-type';
+export * from './native-encoded-video-chunk-constructor';
+export * from './native-encoded-video-chunk-type';
 export * from './native-event-target';
 export * from './native-web-codecs-error-callback';
 export * from './window';

@@ -3,6 +3,7 @@ import { createAudioDataConstructor } from './factories/audio-data-constructor';
 import { createAudioDecoderConstructor } from './factories/audio-decoder-constructor';
 import { createAudioEncoderConstructor } from './factories/audio-encoder-constructor';
 import { createEncodedAudioChunkConstructor } from './factories/encoded-audio-chunk-constructor';
+import { createEncodedVideoChunkConstructor } from './factories/encoded-video-chunk-constructor';
 import { createFakeAudioDataConstructor } from './factories/fake-audio-data-constructor';
 import { createFakeAudioDecoderConstructor } from './factories/fake-audio-decoder-constructor';
 import { createFakeAudioEncoderConstructor } from './factories/fake-audio-encoder-constructor';
@@ -12,6 +13,7 @@ import { createNativeAudioDataConstructor } from './factories/native-audio-data-
 import { createNativeAudioDecoderConstructor } from './factories/native-audio-decoder-constructor';
 import { createNativeAudioEncoderConstructor } from './factories/native-audio-encoder-constructor';
 import { createNativeEncodedAudioChunkConstructor } from './factories/native-encoded-audio-chunk-constructor';
+import { createNativeEncodedVideoChunkConstructor } from './factories/native-encoded-video-chunk-constructor';
 import { createReadVorbisConfig } from './factories/read-vorbis-config';
 import { createWindow } from './factories/window';
 import { computeCopyElementCount } from './functions/compute-copy-element-count';
@@ -31,7 +33,7 @@ import { convertUint8ToInt32 } from './functions/convert-uint8-to-int32';
 import { detachArrayBuffer } from './functions/detach-array-buffer';
 import { filterEntries } from './functions/filter-entries';
 import { reverseByte } from './functions/reverse-byte';
-import { INativeAudioData, INativeEncodedAudioChunk } from './interfaces';
+import { INativeAudioData, INativeEncodedAudioChunk, INativeEncodedVideoChunk } from './interfaces';
 
 /*
  * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
@@ -102,3 +104,13 @@ const encodedAudioChunkConstructor = createEncodedAudioChunkConstructor(
 );
 
 export { encodedAudioChunkConstructor as EncodedAudioChunk };
+
+const nativeEncodedVideoChunkConstructor = createNativeEncodedVideoChunkConstructor(window);
+const nativeEncodedVideoChunks = new WeakMap<INativeEncodedVideoChunk, INativeEncodedVideoChunk>();
+const encodedVideoChunkConstructor = createEncodedVideoChunkConstructor(
+    detachArrayBuffer,
+    nativeEncodedVideoChunkConstructor,
+    nativeEncodedVideoChunks
+);
+
+export { encodedVideoChunkConstructor as EncodedVideoChunk };

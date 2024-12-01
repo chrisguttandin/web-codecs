@@ -22,3 +22,5 @@ export * from './native-audio-encoder-support';
 export * from './native-encoded-audio-chunk';
 export * from './native-encoded-audio-chunk-init';
 export * from './native-encoded-audio-chunk-metadata';
+export * from './native-encoded-video-chunk';
+export * from './native-encoded-video-chunk-init';
