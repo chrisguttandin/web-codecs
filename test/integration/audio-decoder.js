@@ -201,6 +201,16 @@ describe('AudioDecoder', () => {
             });
         });
 
+        describe('with a codec with spaces', () => {
+            it('should throw a TypeError', (done) => {
+                AudioDecoder.isConfigSupported({ codec: '  mp3  ' }).catch((err) => {
+                    expect(err).to.be.an.instanceOf(TypeError);
+
+                    done();
+                });
+            });
+        });
+
         describe('with a known codec', () => {
             for (const codec of KNOWN_AUDIO_CODECS) {
                 describe(`with "${codec}"`, () => {
@@ -552,6 +562,26 @@ describe('AudioDecoder', () => {
                 let codec;
 
                 beforeEach(() => (codec = "audio/webm; codecs='opus'"));
+
+                it('should throw a TypeError', () => {
+                    expect(() => audioDecoder.configure({ codec })).to.throw(TypeError);
+                });
+
+                it('should not change the state', (done) => {
+                    try {
+                        audioDecoder.configure({ codec });
+                    } catch {
+                        expect(audioDecoder.state).to.equal('unconfigured');
+
+                        done();
+                    }
+                });
+            });
+
+            describe('with a codec with spaces', () => {
+                let codec;
+
+                beforeEach(() => (codec = '  mp3  '));
 
                 it('should throw a TypeError', () => {
                     expect(() => audioDecoder.configure({ codec })).to.throw(TypeError);
