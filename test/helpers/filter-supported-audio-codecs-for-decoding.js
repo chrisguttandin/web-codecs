@@ -1,5 +1,5 @@
 export const filterSupportedAudioCodecsForDecoding = (knownAudioCodecs, userAgent) =>
-    /Chrome\/134/.test(userAgent)
+    /Chrome\/13[45]/.test(userAgent)
         ? knownAudioCodecs.filter((knownAudioCodec) =>
               [
                   'alaw',
