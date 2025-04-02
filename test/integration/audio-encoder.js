@@ -946,7 +946,7 @@ describe('AudioEncoder', () => {
                                     expect(encodedAudioChunkMetadata).to.deep.equal({
                                         decoderConfig
                                     });
-                                } else if (!/Firefox\/13[67]/.test(navigator.userAgent)) {
+                                } else if (!/Firefox\/13[78]/.test(navigator.userAgent)) {
                                     expect(encodedAudioChunkMetadata).to.deep.equal({
                                         decoderConfig: { ...decoderConfig, description: new Uint8Array(decoderConfig.description).buffer }
                                     });
