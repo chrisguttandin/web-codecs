@@ -20,7 +20,7 @@ export const createAudioDecoderConstructor = (
         #internalAudioDecoder: Omit<INativeAudioDecoder, 'ondequeue'>;
 
         // tslint:disable-next-line:member-access
-        #numberOfFrames = 0;
+        #numberOfFrames: null | number = null;
 
         // tslint:disable-next-line:member-access
         #ondequeue: null | [TEventHandler<this>, TEventHandler<this>];
@@ -38,9 +38,14 @@ export const createAudioDecoderConstructor = (
                               ? {
                                     // Bug #11: Chrome sometimes gets the timestamp slightly wrong.
                                     output: (audioData) => {
-                                        const timestamp = Math.floor((this.#numberOfFrames * 1000000) / audioData.sampleRate);
+                                        const timestamp =
+                                            this.#numberOfFrames === null
+                                                ? audioData.timestamp
+                                                : Math.floor((this.#numberOfFrames * 1000000) / audioData.sampleRate);
 
-                                        if (audioData.timestamp !== timestamp) {
+                                        if (this.#numberOfFrames === null) {
+                                            this.#numberOfFrames = Math.round((timestamp * audioData.sampleRate) / 1000000);
+                                        } else if (audioData.timestamp !== timestamp) {
                                             Object.defineProperty(audioData, 'timestamp', { get: () => timestamp });
                                         }
 
@@ -99,7 +104,7 @@ export const createAudioDecoderConstructor = (
         }
 
         public reset(): void {
-            this.#numberOfFrames = 0;
+            this.#numberOfFrames = null;
 
             return this.#internalAudioDecoder.reset();
         }

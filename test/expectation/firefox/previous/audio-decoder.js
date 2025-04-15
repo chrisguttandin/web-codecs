@@ -1,3 +1,4 @@
+import { VORBIS_DESCRIPTION } from '../../../helpers/vorbis-description';
 import { loadFixtureAsArrayBuffer } from '../../../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../../../helpers/load-fixture-as-json';
 import { stub } from 'sinon';
@@ -60,6 +61,51 @@ describe('AudioDecoder', () => {
 
                 return numberOfFrames + audioData.numberOfFrames;
             }, 0);
+        });
+    });
+
+    describe('with a vorbis file', () => {
+        // bug #25
+
+        let encodedArrayBuffer;
+        let json;
+        let output;
+
+        beforeEach(async () => {
+            [encodedArrayBuffer, json] = await Promise.all([
+                loadFixtureAsArrayBuffer(`sine-vorbis.ogg`),
+                loadFixtureAsJson(`sine-vorbis.ogg.json`)
+            ]);
+
+            output = stub();
+        });
+
+        it('should emit multiple instances of the AudioData constructor starting with a wrong timestamp', async () => {
+            // eslint-disable-next-line no-undef
+            const audioDecoder = new AudioDecoder({
+                error: () => {
+                    throw new Error('This should never be called.');
+                },
+                output
+            });
+
+            audioDecoder.configure({ ...json.config, description: VORBIS_DESCRIPTION });
+
+            const [{ data, duration }] = json.encodedAudioChunks;
+
+            audioDecoder.decode(
+                // eslint-disable-next-line no-undef
+                new EncodedAudioChunk({
+                    data: encodedArrayBuffer.slice(...data),
+                    duration,
+                    timestamp: 1000000,
+                    type: 'key'
+                })
+            );
+
+            await audioDecoder.flush();
+
+            expect(output.getCalls()[0].args[0].timestamp).to.equal(0);
         });
     });
 });
