@@ -9,6 +9,8 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 100000,
 
+        browsers: ['ChromeCanaryHeadless'],
+
         client: {
             mocha: {
                 bail: true,
@@ -25,13 +27,13 @@ module.exports = (config) => {
                 served: true,
                 watched: true
             },
-            'test/expectation/chrome/current/**/*.js'
+            'test/expectation/chrome/canary/**/*.js'
         ],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            'test/expectation/chrome/current/**/*.js': 'webpack'
+            'test/expectation/chrome/canary/**/*.js': 'webpack'
         },
 
         reporters: ['dots'],
@@ -71,36 +73,4 @@ module.exports = (config) => {
             noInfo: true
         }
     });
-
-    if (env.CI) {
-        config.set({
-            browserStack: {
-                accessKey: env.BROWSER_STACK_ACCESS_KEY,
-                build: `${env.GITHUB_RUN_ID}/expectation-chrome`,
-                forceLocal: true,
-                localIdentifier: `${Math.floor(Math.random() * 1000000)}`,
-                project: env.GITHUB_REPOSITORY,
-                username: env.BROWSER_STACK_USERNAME,
-                video: false
-            },
-
-            browsers: ['ChromeBrowserStack'],
-
-            captureTimeout: 300000,
-
-            customLaunchers: {
-                ChromeBrowserStack: {
-                    base: 'BrowserStack',
-                    browser: 'chrome',
-                    captureTimeout: 300,
-                    os: 'OS X',
-                    os_version: 'Big Sur' // eslint-disable-line camelcase
-                }
-            }
-        });
-    } else {
-        config.set({
-            browsers: ['ChromeHeadless']
-        });
-    }
 };
