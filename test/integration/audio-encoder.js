@@ -924,7 +924,6 @@ describe('AudioEncoder', () => {
                                     codec === 'opus' &&
                                     // eslint-disable-next-line no-undef
                                     !process.env.CI &&
-                                    !/Chrome\/138/.test(navigator.userAgent) &&
                                     !/Firefox/.test(navigator.userAgent)
                                 ) {
                                     expect(encodedAudioChunk.byteLength).to.equal(byteLength);
@@ -935,7 +934,7 @@ describe('AudioEncoder', () => {
                                 expect(encodedAudioChunk.type).to.equal(type);
 
                                 // eslint-disable-next-line no-undef
-                                if (!process.env.CI && !/Chrome\/138/.test(navigator.userAgent) && !/Firefox/.test(navigator.userAgent)) {
+                                if (!process.env.CI && !/Firefox/.test(navigator.userAgent)) {
                                     const uint8Array = new Uint8Array(encodedAudioChunk.byteLength);
 
                                     encodedAudioChunk.copyTo(uint8Array);
