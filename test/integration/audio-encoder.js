@@ -874,12 +874,13 @@ describe('AudioEncoder', () => {
                         let json;
 
                         beforeEach(async () => {
+                            const browserSuffix = codec === 'opus' ? `.${/Firefox/.test(navigator.userAgent) ? 'firefox' : 'chrome'}` : '';
                             const escapedCodec = codec.replaceAll('.', '-');
 
                             [decodedArrayBuffer, encodedArrayBuffer, json] = await Promise.all([
                                 loadFixtureAsArrayBuffer(`sine-pcm-${format}.wav`),
-                                loadFixtureAsArrayBuffer(`sine-pcm-${format}.${escapedCodec}.${container}`),
-                                loadFixtureAsJson(`sine-pcm-${format}.${escapedCodec}.json`)
+                                loadFixtureAsArrayBuffer(`sine-pcm-${format}.${escapedCodec}${browserSuffix}.${container}`),
+                                loadFixtureAsJson(`sine-pcm-${format}.${escapedCodec}${browserSuffix}.json`)
                             ]);
 
                             audioEncoder.configure(json.config);
@@ -920,12 +921,8 @@ describe('AudioEncoder', () => {
 
                                 const { byteLength, data, decoderConfig, duration, type } = json.encodedAudioChunks[index];
 
-                                if (
-                                    codec === 'opus' &&
-                                    // eslint-disable-next-line no-undef
-                                    !process.env.CI &&
-                                    !/Firefox/.test(navigator.userAgent)
-                                ) {
+                                // eslint-disable-next-line no-undef
+                                if (codec !== 'vorbis' && !process.env.CI) {
                                     expect(encodedAudioChunk.byteLength).to.equal(byteLength);
                                 }
 
@@ -934,7 +931,7 @@ describe('AudioEncoder', () => {
                                 expect(encodedAudioChunk.type).to.equal(type);
 
                                 // eslint-disable-next-line no-undef
-                                if (!process.env.CI && !/Firefox/.test(navigator.userAgent)) {
+                                if (codec !== 'vorbis' && !process.env.CI) {
                                     const uint8Array = new Uint8Array(encodedAudioChunk.byteLength);
 
                                     encodedAudioChunk.copyTo(uint8Array);
@@ -950,7 +947,7 @@ describe('AudioEncoder', () => {
                                     expect(encodedAudioChunkMetadata).to.deep.equal({
                                         decoderConfig
                                     });
-                                } else if (!/Firefox\/1(?:39|40)/.test(navigator.userAgent)) {
+                                } else if (codec !== 'vorbis') {
                                     expect(encodedAudioChunkMetadata).to.deep.equal({
                                         decoderConfig: { ...decoderConfig, description: new Uint8Array(decoderConfig.description).buffer }
                                     });

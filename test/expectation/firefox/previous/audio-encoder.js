@@ -13,7 +13,7 @@ describe('AudioEncoder', () => {
         beforeEach(async () => {
             [decodedArrayBuffer, json] = await Promise.all([
                 loadFixtureAsArrayBuffer(`sine-pcm-s16.wav`),
-                loadFixtureAsJson(`sine-pcm-s16.opus.json`)
+                loadFixtureAsJson(`sine-pcm-s16.opus.firefox.json`)
             ]);
 
             output = stub();
