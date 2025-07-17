@@ -874,7 +874,10 @@ describe('AudioEncoder', () => {
                         let json;
 
                         beforeEach(async () => {
-                            const browserSuffix = codec === 'opus' ? `.${/Firefox/.test(navigator.userAgent) ? 'firefox' : 'chrome'}` : '';
+                            const browserSuffix =
+                                codec === 'opus'
+                                    ? `.${/Firefox\/141/.test(navigator.userAgent) ? 'firefox-developer' : /Firefox/.test(navigator.userAgent) ? 'firefox' : 'chrome'}`
+                                    : '';
                             const escapedCodec = codec.replaceAll('.', '-');
 
                             [decodedArrayBuffer, encodedArrayBuffer, json] = await Promise.all([
