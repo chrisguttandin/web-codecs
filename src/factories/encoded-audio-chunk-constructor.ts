@@ -23,6 +23,11 @@ export const createEncodedAudioChunkConstructor = (
                     ? new fakeEncodedAudioChunkConstructor(init)
                     : new nativeEncodedAudioChunkConstructor(init);
 
+            // Bug #28: Safari throws no error when calling the constructor without a timestamp property.
+            if (init.timestamp === undefined) {
+                throw new TypeError("Failed to construct 'EncodedAudioChunk'.");
+            }
+
             if (init.transfer !== undefined) {
                 // Bug 16: Firefox is ignoring multiple references to the same ArrayBuffer.
                 if (init.transfer.length !== new Set(init.transfer).size) {
