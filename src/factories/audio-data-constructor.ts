@@ -70,6 +70,15 @@ export const createAudioDataConstructor = (
             if (nativeAudioDataConstructor !== null) {
                 nativeAudioDatas.set(this, this.#internalAudioData);
 
+                const { duration, timestamp } = this.#internalAudioData;
+
+                // Bug #26: Safari sets the duration to null when calling close() on an instance of AudioData.
+                Object.defineProperty(this.#internalAudioData, 'duration', {
+                    get: () => (this.#internalAudioData.format === null ? 0 : duration)
+                });
+                // Bug #27: Safari sets the timestamp to 0 when calling close() on an instance of AudioData.
+                Object.defineProperty(this.#internalAudioData, 'timestamp', { get: () => timestamp });
+
                 // This violates all good pratices but it is necessary to allow this AudioData to be used with the native implementation.
                 return <AudioData>this.#internalAudioData;
             }
