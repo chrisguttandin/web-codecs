@@ -29,7 +29,7 @@ export const createEncodedAudioChunkConstructor = (
             }
 
             if (init.transfer !== undefined) {
-                // Bug 16: Firefox is ignoring multiple references to the same ArrayBuffer.
+                // Bug #16: Firefox is ignoring multiple references to the same ArrayBuffer.
                 if (init.transfer.length !== new Set(init.transfer).size) {
                     throw new DOMException("Failed to construct 'EncodedAudioChunk'.", 'DataCloneError');
                 }
