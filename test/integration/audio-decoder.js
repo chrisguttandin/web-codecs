@@ -6,6 +6,7 @@ import { computeDelta } from '../helpers/compute-delta';
 import { filterSupportedAudioCodecsForDecoding } from '../helpers/filter-supported-audio-codecs-for-decoding';
 import { loadFixtureAsArrayBuffer } from '../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../helpers/load-fixture-as-json';
+import { isSafari } from '../helpers/is-safari';
 
 const FLAC_DESCRIPTION = new Uint8Array([
     102, 76, 97, 67, 0, 0, 0, 34, 18, 0, 18, 0, 0, 0, 186, 0, 5, 57, 11, 184, 0, 240, 0, 3, 169, 128, 148, 172, 171, 223, 193, 198, 120,
@@ -807,6 +808,36 @@ describe('AudioDecoder', () => {
 
                                     if (navigator.userAgent.includes('Firefox') && codec === 'vorbis') {
                                         json.audioDatas.unshift({ data: [58, 58], duration: 0, numberOfFrames: 0 });
+                                    }
+
+                                    // Bug #29: Safari encodes PCM data in chunks.
+                                    if (isSafari(navigator) && ['alaw', 'ulaw'].includes(codec)) {
+                                        expect(json.audioDatas.length).to.equal(1);
+
+                                        const [audioData] = json.audioDatas;
+                                        const bytesPerFrame = 2;
+                                        const numberOfFramesPerChunk = 2048;
+
+                                        json.audioDatas = Array.from(
+                                            { length: Math.ceil(audioData.numberOfFrames / numberOfFramesPerChunk) },
+                                            (_, index) => {
+                                                const data = [
+                                                    audioData.data[0] + numberOfFramesPerChunk * bytesPerFrame * index,
+                                                    Math.min(
+                                                        audioData.data[0] + numberOfFramesPerChunk * bytesPerFrame * (index + 1),
+                                                        audioData.data[1]
+                                                    )
+                                                ];
+                                                const numberOfFrames = (data[1] - data[0]) / bytesPerFrame;
+                                                const duration = Math.floor((numberOfFrames * 1000000) / json.config.sampleRate);
+
+                                                return {
+                                                    data,
+                                                    duration,
+                                                    numberOfFrames
+                                                };
+                                            }
+                                        );
                                     }
 
                                     expect(calls.length).to.equal(json.audioDatas.length);
