@@ -9,13 +9,18 @@ import {
 import { TEventHandler, TNativeCodecState } from '../types';
 import type { createFakeAudioDecoderConstructor } from './fake-audio-decoder-constructor';
 import type { createNativeAudioDecoderConstructor } from './native-audio-decoder-constructor';
+import type { createTestFlacDecodingSupport } from './test-flac-decoding-support';
 
 export const createAudioDecoderConstructor = (
     fakeAudioDecoderConstructor: ReturnType<typeof createFakeAudioDecoderConstructor>,
     nativeAudioDecoderConstructor: ReturnType<typeof createNativeAudioDecoderConstructor>,
-    nativeEncodedAudioChunks: WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>
+    nativeEncodedAudioChunks: WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>,
+    testFlacDecodingSupport: ReturnType<typeof createTestFlacDecodingSupport>
 ): IAudioDecoderConstructor => {
     return class AudioDecoder extends EventTarget implements INativeAudioDecoder {
+        // tslint:disable-next-line:member-access
+        #init: INativeAudioDecoderInit;
+
         // tslint:disable-next-line:member-access
         #internalAudioDecoder: Omit<INativeAudioDecoder, 'ondequeue'>;
 
@@ -28,6 +33,7 @@ export const createAudioDecoderConstructor = (
         constructor(init: INativeAudioDecoderInit) {
             super();
 
+            this.#init = init;
             // Bug #5: AudioDecoder is not yet implemented in Safari.
             this.#internalAudioDecoder =
                 nativeAudioDecoderConstructor === null
@@ -92,6 +98,18 @@ export const createAudioDecoderConstructor = (
         }
 
         public configure(config: INativeAudioDecoderConfig): void {
+            const { codec } = config;
+
+            if (codec === 'flac') {
+                // Bug #30: Safari pretends to support decoding FLAC but then fails when doing so.
+                testFlacDecodingSupport().then((result) => {
+                    if (!result) {
+                        this.#internalAudioDecoder.close();
+                        this.#init.error(new DOMException("Failed to execute 'configure' on 'AudioDecoder'.", 'NotSupportedError'));
+                    }
+                });
+            }
+
             return this.#internalAudioDecoder.configure(config);
         }
 
@@ -112,7 +130,18 @@ export const createAudioDecoderConstructor = (
         public static isConfigSupported(config: INativeAudioDecoderConfig): Promise<INativeAudioDecoderSupport> {
             return nativeAudioDecoderConstructor === null
                 ? fakeAudioDecoderConstructor.isConfigSupported(config)
-                : nativeAudioDecoderConstructor.isConfigSupported(config);
+                : config.codec === 'flac'
+                  ? nativeAudioDecoderConstructor.isConfigSupported(config).then((audioDecoderSupport) =>
+                        // Bug #30: Safari pretends to support decoding FLAC but then fails when doing so.
+                        testFlacDecodingSupport().then((result) => {
+                            if (!result) {
+                                return { ...audioDecoderSupport, supported: result };
+                            }
+
+                            return audioDecoderSupport;
+                        })
+                    )
+                  : nativeAudioDecoderConstructor.isConfigSupported(config);
         }
     };
 };

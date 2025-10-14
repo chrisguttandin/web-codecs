@@ -15,6 +15,7 @@ import { createNativeAudioEncoderConstructor } from './factories/native-audio-en
 import { createNativeEncodedAudioChunkConstructor } from './factories/native-encoded-audio-chunk-constructor';
 import { createNativeEncodedVideoChunkConstructor } from './factories/native-encoded-video-chunk-constructor';
 import { createReadVorbisConfig } from './factories/read-vorbis-config';
+import { createTestFlacDecodingSupport } from './factories/test-flac-decoding-support';
 import { createWindow } from './factories/window';
 import { computeCopyElementCount } from './functions/compute-copy-element-count';
 import { convertBufferSourceToTypedArray } from './functions/convert-buffer-source-to-typed-array';
@@ -74,11 +75,13 @@ export { audioDataConstructor as AudioData };
 const isKnownAudioCodec = createIsKnownAudioCodec(KNOWN_AUDIO_CODECS);
 const fakeAudioDecoderConstructor = createFakeAudioDecoderConstructor(filterEntries, isKnownAudioCodec);
 const nativeAudioDecoderConstructor = createNativeAudioDecoderConstructor(window);
+const nativeEncodedAudioChunkConstructor = createNativeEncodedAudioChunkConstructor(window);
 const nativeEncodedAudioChunks = new WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>();
 const audioDecoderConstructor = createAudioDecoderConstructor(
     fakeAudioDecoderConstructor,
     nativeAudioDecoderConstructor,
-    nativeEncodedAudioChunks
+    nativeEncodedAudioChunks,
+    createTestFlacDecodingSupport(nativeAudioDecoderConstructor, nativeEncodedAudioChunkConstructor)
 );
 
 export { audioDecoderConstructor as AudioDecoder };
@@ -95,7 +98,6 @@ const audioEncoderConstructor = createAudioEncoderConstructor(
 export { audioEncoderConstructor as AudioEncoder };
 
 const fakeEncodedAudioChunkConstructor = createFakeEncodedAudioChunkConstructor(convertBufferSourceToTypedArray, detachArrayBuffer);
-const nativeEncodedAudioChunkConstructor = createNativeEncodedAudioChunkConstructor(window);
 const encodedAudioChunkConstructor = createEncodedAudioChunkConstructor(
     detachArrayBuffer,
     fakeEncodedAudioChunkConstructor,

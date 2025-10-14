@@ -48,7 +48,6 @@ export const filterSupportedAudioCodecsForDecoding = (knownAudioCodecs, userAgen
           : knownAudioCodecs.filter((knownAudioCodec) =>
                 [
                     'alaw',
-                    'flac',
                     'mp3',
                     'mp4a.40.02',
                     'mp4a.40.05',

@@ -75,4 +75,63 @@ describe('AudioDecoder', () => {
             });
         });
     }
+
+    describe('with a flac file', () => {
+        // bug #30
+
+        let encodedArrayBuffer;
+        let error;
+        let json;
+        let output;
+
+        beforeEach(async () => {
+            [encodedArrayBuffer, json] = await Promise.all([
+                loadFixtureAsArrayBuffer(`sine-flac.flac`),
+                loadFixtureAsJson(`sine-flac.flac.json`)
+            ]);
+
+            error = stub();
+            output = stub();
+        });
+
+        it('should throw an error', async () => {
+            // eslint-disable-next-line no-undef
+            const audioDecoder = new AudioDecoder({
+                error,
+                output
+            });
+
+            audioDecoder.configure({ ...json.config, description: encodedArrayBuffer.slice(...json.config.description) });
+
+            const [{ data, duration }] = json.encodedAudioChunks;
+
+            audioDecoder.decode(
+                // eslint-disable-next-line no-undef
+                new EncodedAudioChunk({
+                    data: encodedArrayBuffer.slice(...data),
+                    duration,
+                    timestamp: 0,
+                    type: 'key'
+                })
+            );
+
+            try {
+                await audioDecoder.flush();
+
+                throw new Error('This should never be called.');
+            } catch (err) {
+                expect(err.message).to.equal('InternalAudioDecoderCocoa decoding failed');
+            }
+
+            expect(error).to.have.been.calledOnce;
+
+            const { args } = error.getCall(0);
+
+            expect(args.length).to.equal(1);
+            expect(args[0].code).to.equal(0);
+            expect(args[0].name).to.equal('EncodingError');
+
+            expect(output).to.have.not.been.called;
+        });
+    });
 });
