@@ -63,11 +63,9 @@ describe('AudioDecoder', () => {
                                 expect(audioData.timestamp).to.equal(duration);
                             } else {
                                 expect(audioData.timestamp).to.equal(duration + 1);
-
-                                duration = audioData.timestamp;
                             }
 
-                            return [duration + audioData.duration, numberOfFrames + audioData.numberOfFrames];
+                            return [audioData.timestamp + audioData.duration, numberOfFrames + audioData.numberOfFrames];
                         },
                         [0, 0]
                     )
