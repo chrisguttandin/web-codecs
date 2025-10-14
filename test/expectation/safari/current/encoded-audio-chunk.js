@@ -4,6 +4,7 @@ describe('EncodedAudioChunk', () => {
             // bug #28
 
             it('should not throw any error', () => {
+                // eslint-disable-next-line no-undef
                 new EncodedAudioChunk({
                     data: new Uint8Array([10, 11, 12]),
                     duration: 123,

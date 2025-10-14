@@ -6,6 +6,7 @@ describe('AudioData', () => {
             const numberOfChannels = 2;
             const numberOfFrames = 100;
 
+            // eslint-disable-next-line no-undef
             audioData = new AudioData({
                 data: new Float32Array(numberOfChannels * numberOfFrames),
                 format: 'f32',
