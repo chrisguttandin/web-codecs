@@ -16,6 +16,7 @@ import { createNativeEncodedAudioChunkConstructor } from './factories/native-enc
 import { createNativeEncodedVideoChunkConstructor } from './factories/native-encoded-video-chunk-constructor';
 import { createReadVorbisConfig } from './factories/read-vorbis-config';
 import { createTestFlacDecodingSupport } from './factories/test-flac-decoding-support';
+import { createTestMp3DecoderDelaySupport } from './factories/test-mp3-decoder-delay-support';
 import { createWindow } from './factories/window';
 import { computeCopyElementCount } from './functions/compute-copy-element-count';
 import { convertBufferSourceToTypedArray } from './functions/convert-buffer-source-to-typed-array';
@@ -81,7 +82,8 @@ const audioDecoderConstructor = createAudioDecoderConstructor(
     fakeAudioDecoderConstructor,
     nativeAudioDecoderConstructor,
     nativeEncodedAudioChunks,
-    createTestFlacDecodingSupport(nativeAudioDecoderConstructor, nativeEncodedAudioChunkConstructor)
+    createTestFlacDecodingSupport(nativeAudioDecoderConstructor, nativeEncodedAudioChunkConstructor),
+    createTestMp3DecoderDelaySupport(nativeAudioDecoderConstructor, nativeEncodedAudioChunkConstructor)
 );
 
 export { audioDecoderConstructor as AudioDecoder };

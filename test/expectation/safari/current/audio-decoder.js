@@ -74,6 +74,75 @@ describe('AudioDecoder', () => {
         });
     }
 
+    describe('with an mp3 file', () => {
+        // bug #31
+
+        let encodedArrayBuffer;
+        let json;
+        let output;
+
+        beforeEach(async () => {
+            [encodedArrayBuffer, json] = await Promise.all([
+                loadFixtureAsArrayBuffer(`sine-mp3.mp3`),
+                loadFixtureAsJson(`sine-mp3.mp3.json`)
+            ]);
+
+            output = stub();
+        });
+
+        it('should skip the decoder delay', async () => {
+            // eslint-disable-next-line no-undef
+            const audioDecoder = new AudioDecoder({
+                error: () => {
+                    throw new Error('This should never be called.');
+                },
+                output
+            });
+
+            audioDecoder.configure(json.config);
+
+            const [{ data, duration }] = json.encodedAudioChunks;
+
+            audioDecoder.decode(
+                // eslint-disable-next-line no-undef
+                new EncodedAudioChunk({
+                    data: encodedArrayBuffer.slice(...data),
+                    duration,
+                    timestamp: 0,
+                    type: 'key'
+                })
+            );
+
+            audioDecoder.configure(json.config);
+            json.encodedAudioChunks.reduce((timestamp, { data, duration }) => {
+                audioDecoder.decode(
+                    // eslint-disable-next-line no-undef
+                    new EncodedAudioChunk({
+                        data: encodedArrayBuffer.slice(...data),
+                        duration,
+                        timestamp,
+                        type: 'key'
+                    })
+                );
+
+                return timestamp + duration;
+            }, 0);
+
+            await audioDecoder.flush();
+
+            const calls = output.getCalls();
+
+            expect(calls.length).to.equal(json.audioDatas.length + 1);
+
+            calls.forEach((call, index) => {
+                const [audioData] = call.args;
+                const numberOfFrames = (json.audioDatas[index]?.numberOfFrames ?? 529) - (index === 0 ? 529 : 0);
+
+                expect(audioData.numberOfFrames).to.equal(numberOfFrames);
+            });
+        });
+    });
+
     describe('with a flac file', () => {
         // bug #30
 

@@ -9,13 +9,17 @@ import {
 import { TEventHandler, TNativeCodecState } from '../types';
 import type { createFakeAudioDecoderConstructor } from './fake-audio-decoder-constructor';
 import type { createNativeAudioDecoderConstructor } from './native-audio-decoder-constructor';
+import type { createNativeEncodedAudioChunkConstructor } from './native-encoded-audio-chunk-constructor';
 import type { createTestFlacDecodingSupport } from './test-flac-decoding-support';
+import type { createTestMp3DecoderDelaySupport } from './test-mp3-decoder-delay-support';
 
 export const createAudioDecoderConstructor = (
     fakeAudioDecoderConstructor: ReturnType<typeof createFakeAudioDecoderConstructor>,
     nativeAudioDecoderConstructor: ReturnType<typeof createNativeAudioDecoderConstructor>,
+    nativeEncodedAudioChunkConstructor: ReturnType<typeof createNativeEncodedAudioChunkConstructor>,
     nativeEncodedAudioChunks: WeakMap<INativeEncodedAudioChunk, INativeEncodedAudioChunk>,
-    testFlacDecodingSupport: ReturnType<typeof createTestFlacDecodingSupport>
+    testFlacDecodingSupport: ReturnType<typeof createTestFlacDecodingSupport>,
+    testMp3DecoderDelaySupport: ReturnType<typeof createTestMp3DecoderDelaySupport>
 ): IAudioDecoderConstructor => {
     return class AudioDecoder extends EventTarget implements INativeAudioDecoder {
         // tslint:disable-next-line:member-access
@@ -30,6 +34,9 @@ export const createAudioDecoderConstructor = (
         // tslint:disable-next-line:member-access
         #ondequeue: null | [TEventHandler<this>, TEventHandler<this>];
 
+        // tslint:disable-next-line:member-access
+        #promisedMp3DecoderDelaySupportResult: null | ReturnType<typeof testMp3DecoderDelaySupport> = null;
+
         constructor(init: INativeAudioDecoderInit) {
             super();
 
@@ -42,8 +49,16 @@ export const createAudioDecoderConstructor = (
                           ...init,
                           ...(typeof init.output === 'function'
                               ? {
-                                    // Bug #11: Chrome sometimes gets the timestamp slightly wrong.
                                     output: (audioData) => {
+                                        // Bug #31: Safari skips the decoder delay when decoding an MP3 file.
+                                        if (
+                                            this.#promisedMp3DecoderDelaySupportResult !== null &&
+                                            [529, 623].includes(audioData.numberOfFrames)
+                                        ) {
+                                            return;
+                                        }
+
+                                        // Bug #11: Chrome sometimes gets the timestamp slightly wrong.
                                         const timestamp =
                                             this.#numberOfFrames === null
                                                 ? audioData.timestamp
@@ -100,7 +115,9 @@ export const createAudioDecoderConstructor = (
         public configure(config: INativeAudioDecoderConfig): void {
             const { codec } = config;
 
-            if (codec === 'flac') {
+            if (codec === 'mp3') {
+                this.#promisedMp3DecoderDelaySupportResult = testMp3DecoderDelaySupport();
+            } else if (codec === 'flac') {
                 // Bug #30: Safari pretends to support decoding FLAC but then fails when doing so.
                 testFlacDecodingSupport().then((result) => {
                     if (!result) {
@@ -114,15 +131,49 @@ export const createAudioDecoderConstructor = (
         }
 
         public decode(chunk: INativeEncodedAudioChunk): void {
-            return this.#internalAudioDecoder.decode(nativeEncodedAudioChunks.get(chunk) ?? chunk);
+            // Bug #31: Safari skips the decoder delay when decoding an MP3 file.
+            if (this.#promisedMp3DecoderDelaySupportResult === null) {
+                return this.#internalAudioDecoder.decode(nativeEncodedAudioChunks.get(chunk) ?? chunk);
+            }
+
+            this.#promisedMp3DecoderDelaySupportResult = this.#promisedMp3DecoderDelaySupportResult.then((result) => {
+                if (this.#promisedMp3DecoderDelaySupportResult !== null) {
+                    if (nativeEncodedAudioChunkConstructor !== null && result) {
+                        const data = new Uint8Array(chunk.byteLength);
+
+                        chunk.copyTo(data);
+
+                        for (let i = 4; i < data.length; i += 1) {
+                            data[i] = 0;
+                        }
+
+                        this.#internalAudioDecoder.decode(
+                            new nativeEncodedAudioChunkConstructor({
+                                data,
+                                timestamp: chunk.timestamp - (chunk.duration ?? 0),
+                                type: 'key'
+                            })
+                        );
+                    }
+
+                    this.#internalAudioDecoder.decode(nativeEncodedAudioChunks.get(chunk) ?? chunk);
+                }
+
+                return false;
+            });
         }
 
         public flush(): Promise<void> {
-            return this.#internalAudioDecoder.flush();
+            if (this.#promisedMp3DecoderDelaySupportResult === null) {
+                return this.#internalAudioDecoder.flush();
+            }
+
+            return this.#promisedMp3DecoderDelaySupportResult.then(() => this.#internalAudioDecoder.flush());
         }
 
         public reset(): void {
             this.#numberOfFrames = null;
+            this.#promisedMp3DecoderDelaySupportResult = null;
 
             return this.#internalAudioDecoder.reset();
         }
