@@ -2,6 +2,7 @@ import { AudioData, AudioEncoder, EncodedAudioChunk } from '../../src/module';
 import { spy, stub } from 'sinon';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
 import { filterSupportedAudioCodecsForEncoding } from '../helpers/filter-supported-audio-codecs-for-encoding';
+import { isSafari } from '../helpers/is-safari';
 import { loadFixtureAsArrayBuffer } from '../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../helpers/load-fixture-as-json';
 
@@ -848,25 +849,53 @@ describe('AudioEncoder', () => {
             });
 
             describe('with a known and supported codec', () => {
-                for (const [codec, container, format] of filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).map(
-                    (knownAudioCodec) =>
-                        knownAudioCodec === 'mp4a.40.02'
+                for (const [codec, container, format] of filterSupportedAudioCodecsForEncoding(
+                    KNOWN_AUDIO_CODECS.filter(
+                        (knownAudioCodec) =>
+                            !(
+                                isSafari(navigator) &&
+                                [
+                                    'mp4a.40.02',
+                                    'mp4a.40.05',
+                                    'mp4a.40.2',
+                                    'mp4a.40.29',
+                                    'mp4a.40.5',
+                                    'mp4a.67',
+                                    'mp4a.69',
+                                    'mp4a.6B',
+                                    'opus',
+                                    'pcm-f32',
+                                    'pcm-s24',
+                                    'pcm-s32',
+                                    'pcm-u8'
+                                ].includes(knownAudioCodec)
+                            )
+                    ),
+                    navigator.userAgent
+                ).map((knownAudioCodec) =>
+                    knownAudioCodec === 'alaw'
+                        ? [knownAudioCodec, 'wav', 's16']
+                        : knownAudioCodec === 'mp4a.40.02'
+                          ? [knownAudioCodec, 'aac', 's16']
+                          : knownAudioCodec === 'mp4a.40.05'
                             ? [knownAudioCodec, 'aac', 's16']
-                            : knownAudioCodec === 'mp4a.40.05'
+                            : knownAudioCodec === 'mp4a.40.2'
                               ? [knownAudioCodec, 'aac', 's16']
-                              : knownAudioCodec === 'mp4a.40.2'
+                              : knownAudioCodec === 'mp4a.40.29'
                                 ? [knownAudioCodec, 'aac', 's16']
-                                : knownAudioCodec === 'mp4a.40.29'
+                                : knownAudioCodec === 'mp4a.40.5'
                                   ? [knownAudioCodec, 'aac', 's16']
-                                  : knownAudioCodec === 'mp4a.40.5'
+                                  : knownAudioCodec === 'mp4a.67'
                                     ? [knownAudioCodec, 'aac', 's16']
-                                    : knownAudioCodec === 'mp4a.67'
-                                      ? [knownAudioCodec, 'aac', 's16']
-                                      : knownAudioCodec === 'opus'
-                                        ? [knownAudioCodec, 'ogg', 's16']
-                                        : knownAudioCodec === 'vorbis'
-                                          ? [knownAudioCodec, 'ogg', 's16']
-                                          : null
+                                    : knownAudioCodec === 'opus'
+                                      ? [knownAudioCodec, 'ogg', 's16']
+                                      : knownAudioCodec === 'pcm-s16'
+                                        ? [knownAudioCodec, 'wav', 's16']
+                                        : knownAudioCodec === 'ulaw'
+                                          ? [knownAudioCodec, 'wav', 's16']
+                                          : knownAudioCodec === 'vorbis'
+                                            ? [knownAudioCodec, 'ogg', 's16']
+                                            : null
                 )) {
                     describe(`with "${codec}" wrapped in "${container}"`, () => {
                         let decodedArrayBuffer;
@@ -931,7 +960,7 @@ describe('AudioEncoder', () => {
                                 expect(encodedAudioChunk.type).to.equal(type);
 
                                 // eslint-disable-next-line no-undef
-                                if (codec !== 'vorbis' && !process.env.CI) {
+                                if (codec !== 'alaw' && codec !== 'ulaw' && codec !== 'vorbis' && !process.env.CI) {
                                     const uint8Array = new Uint8Array(encodedAudioChunk.byteLength);
 
                                     encodedAudioChunk.copyTo(uint8Array);
