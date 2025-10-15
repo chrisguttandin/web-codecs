@@ -1,5 +1,7 @@
+import { isSafari } from './is-safari';
+
 export const computeDelta = (expectedDestinationValue, sourceFormat, destinationFormat) => {
-    if (navigator.userAgent.includes('Firefox')) {
+    if (/Firefox/.test(navigator.userAgent) || isSafari(navigator)) {
         if (sourceFormat === 'f32') {
             if (destinationFormat === 's16') {
                 return 1;

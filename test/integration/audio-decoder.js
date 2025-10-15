@@ -858,7 +858,7 @@ describe('AudioDecoder', () => {
                                         const { data, duration, numberOfFrames } = json.audioDatas[index];
 
                                         expect(audioData.duration).to.equal(duration);
-                                        expect(audioData.format).to.equal(navigator.userAgent.includes('Firefox') ? 'f32' : format);
+                                        expect(audioData.format).to.equal(/Chrome/.test(navigator.userAgent) ? format : 'f32');
                                         expect(audioData.numberOfChannels).to.equal(json.config.numberOfChannels);
                                         expect(audioData.numberOfFrames).to.equal(numberOfFrames);
                                         expect(audioData.sampleRate).to.equal(json.config.sampleRate);
@@ -880,10 +880,7 @@ describe('AudioDecoder', () => {
 
                                             audioData.copyTo(uint8Array, { format, planeIndex: 0 });
 
-                                            if (
-                                                navigator.userAgent.includes('Firefox') &&
-                                                ['mp4a.40.2', 'opus', 'vorbis'].includes(codec)
-                                            ) {
+                                            if (!/Chrome/.test(navigator.userAgent) && ['mp4a.40.2', 'opus', 'vorbis'].includes(codec)) {
                                                 const float32Array = new Float32Array(uint8Array.buffer);
                                                 const decodedFloat32Array = new Float32Array(decodedArrayBuffer.slice(...data));
 
