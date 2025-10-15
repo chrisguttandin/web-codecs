@@ -208,8 +208,7 @@
         { "data": [472364, 474668], "duration": 24000, "numberOfFrames": 1152 },
         { "data": [474668, 476972], "duration": 24000, "numberOfFrames": 1152 },
         { "data": [476972, 479276], "duration": 24000, "numberOfFrames": 1152 },
-        { "data": [479276, 481580], "duration": 24000, "numberOfFrames": 1152 },
-        { "data": [481580, 483884], "duration": 24000, "numberOfFrames": 1152 }
+        { "data": [479276, 481580], "duration": 24000, "numberOfFrames": 1152 }
     ],
     "config": {
         "codec": "mp3",
@@ -217,7 +216,6 @@
         "sampleRate": 48000
     },
     "encodedAudioChunks": [
-        { "data": [44, 332], "duration": 24000 },
         { "data": [332, 620], "duration": 24000 },
         { "data": [620, 908], "duration": 24000 },
         { "data": [908, 1196], "duration": 24000 },
