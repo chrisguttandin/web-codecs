@@ -4,9 +4,9 @@ import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
 import { VORBIS_DESCRIPTION } from '../helpers/vorbis-description';
 import { computeDelta } from '../helpers/compute-delta';
 import { filterSupportedAudioCodecsForDecoding } from '../helpers/filter-supported-audio-codecs-for-decoding';
+import { isSafari } from '../helpers/is-safari';
 import { loadFixtureAsArrayBuffer } from '../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../helpers/load-fixture-as-json';
-import { isSafari } from '../helpers/is-safari';
 
 const FLAC_DESCRIPTION = new Uint8Array([
     102, 76, 97, 67, 0, 0, 0, 34, 18, 0, 18, 0, 0, 0, 186, 0, 5, 57, 11, 184, 0, 240, 0, 3, 169, 128, 148, 172, 171, 223, 193, 198, 120,
