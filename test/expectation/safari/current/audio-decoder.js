@@ -100,20 +100,6 @@ describe('AudioDecoder', () => {
             });
 
             audioDecoder.configure(json.config);
-
-            const [{ data, duration }] = json.encodedAudioChunks;
-
-            audioDecoder.decode(
-                // eslint-disable-next-line no-undef
-                new EncodedAudioChunk({
-                    data: encodedArrayBuffer.slice(...data),
-                    duration,
-                    timestamp: 0,
-                    type: 'key'
-                })
-            );
-
-            audioDecoder.configure(json.config);
             json.encodedAudioChunks.reduce((timestamp, { data, duration }) => {
                 audioDecoder.decode(
                     // eslint-disable-next-line no-undef
