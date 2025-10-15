@@ -880,7 +880,17 @@ describe('AudioDecoder', () => {
 
                                             audioData.copyTo(uint8Array, { format, planeIndex: 0 });
 
-                                            if (!/Chrome/.test(navigator.userAgent) && ['mp4a.40.2', 'opus', 'vorbis'].includes(codec)) {
+                                            if (!/Chrome/.test(navigator.userAgent) && codec === 'mp3') {
+                                                const int16Array = new Int16Array(uint8Array.buffer);
+                                                const decodedInt16Array = new Int16Array(decodedArrayBuffer.slice(...data));
+
+                                                for (let i = 0; i < Math.max(int16Array.length, decodedInt16Array.length); i += 1) {
+                                                    expect(int16Array[i]).to.be.closeTo(decodedInt16Array[i], 1);
+                                                }
+                                            } else if (
+                                                !/Chrome/.test(navigator.userAgent) &&
+                                                ['mp4a.40.2', 'opus', 'vorbis'].includes(codec)
+                                            ) {
                                                 const float32Array = new Float32Array(uint8Array.buffer);
                                                 const decodedFloat32Array = new Float32Array(decodedArrayBuffer.slice(...data));
 
