@@ -81,6 +81,7 @@ const nativeEncodedAudioChunks = new WeakMap<INativeEncodedAudioChunk, INativeEn
 const audioDecoderConstructor = createAudioDecoderConstructor(
     fakeAudioDecoderConstructor,
     nativeAudioDecoderConstructor,
+    nativeEncodedAudioChunkConstructor,
     nativeEncodedAudioChunks,
     createTestFlacDecodingSupport(nativeAudioDecoderConstructor, nativeEncodedAudioChunkConstructor),
     createTestMp3DecoderDelaySupport(nativeAudioDecoderConstructor, nativeEncodedAudioChunkConstructor)
