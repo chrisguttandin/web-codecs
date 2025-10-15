@@ -740,17 +740,17 @@ describe('AudioDecoder', () => {
                     navigator.userAgent
                 )
                     .map((knownAudioCodec) =>
-                        knownAudioCodec === 'mp4a.40.2'
-                            ? [
-                                  [knownAudioCodec, 'aac', 'f32-planar'],
-                                  [knownAudioCodec, 'mp4', 'f32-planar']
-                              ]
-                            : knownAudioCodec === 'alaw'
-                              ? [[knownAudioCodec, 'wav', 's16']]
-                              : knownAudioCodec === 'flac'
-                                ? [[knownAudioCodec, 'flac', 's16']]
-                                : knownAudioCodec === 'mp3'
-                                  ? [[knownAudioCodec, 'mp3', 's16-planar']]
+                        knownAudioCodec === 'alaw'
+                            ? [[knownAudioCodec, 'wav', 's16']]
+                            : knownAudioCodec === 'flac'
+                              ? [[knownAudioCodec, 'flac', 's16']]
+                              : knownAudioCodec === 'mp3'
+                                ? [[knownAudioCodec, 'mp3', 's16-planar']]
+                                : knownAudioCodec === 'mp4a.40.2'
+                                  ? [
+                                        [knownAudioCodec, 'aac', 'f32-planar'],
+                                        [knownAudioCodec, 'mp4', 'f32-planar']
+                                    ]
                                   : knownAudioCodec === 'opus'
                                     ? [[knownAudioCodec, 'ogg', 'f32']]
                                     : knownAudioCodec === 'ulaw'
