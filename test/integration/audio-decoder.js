@@ -535,7 +535,8 @@ describe('AudioDecoder', () => {
                                 expect(error).to.have.not.been.called;
 
                                 await new Promise((resolve) => {
-                                    setTimeout(resolve);
+                                    // Bug #30: The patch necessary for Safari requires a small delay.
+                                    setTimeout(resolve, 100);
                                 });
 
                                 expect(error).to.have.been.calledOnce;
@@ -553,7 +554,8 @@ describe('AudioDecoder', () => {
                                 expect(audioDecoder.state).to.equal('configured');
 
                                 await new Promise((resolve) => {
-                                    setTimeout(resolve);
+                                    // Bug #30: The patch necessary for Safari requires a small delay.
+                                    setTimeout(resolve, 100);
                                 });
 
                                 expect(audioDecoder.state).to.equal('closed');
