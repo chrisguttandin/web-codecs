@@ -151,40 +151,6 @@ describe('AudioEncoder', () => {
                 ]);
             });
 
-            // bug #12
-            it('should emit multiple instances of the AudioData constructor with a wrong duration', async () => {
-                audioEncoder.configure(json.config);
-                json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
-                    audioEncoder.encode(
-                        // eslint-disable-next-line no-undef
-                        new AudioData({
-                            data: decodedArrayBuffer.slice(...data),
-                            format: 's16',
-                            numberOfChannels: json.config.numberOfChannels,
-                            numberOfFrames,
-                            sampleRate: json.config.sampleRate,
-                            timestamp
-                        })
-                    );
-
-                    return timestamp + duration;
-                }, 0);
-
-                await audioEncoder.flush();
-
-                for (const call of output.getCalls()) {
-                    const { duration, timestamp } = call.args[0];
-
-                    if ([240000, 500000, 1020000, 2040000, 4080000].includes(timestamp)) {
-                        expect(duration).to.equal(19999);
-                    } else if ([259999, 519999, 1039999, 2079999, 4179999].includes(timestamp)) {
-                        expect(duration).to.equal(20001);
-                    } else {
-                        expect(duration).to.equal(20000);
-                    }
-                }
-            });
-
             // bug #13
             it('should emit multiple instances of the AudioData constructor with a wrong timestamp', async () => {
                 audioEncoder.configure(json.config);
