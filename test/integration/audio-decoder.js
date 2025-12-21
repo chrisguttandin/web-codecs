@@ -771,7 +771,11 @@ describe('AudioDecoder', () => {
                             const escapedCodec = codec.replaceAll('.', '-');
 
                             [decodedArrayBuffer, encodedArrayBuffer, json] = await Promise.all([
-                                loadFixtureAsArrayBuffer(`sine-${escapedCodec}.${format}.wav`),
+                                loadFixtureAsArrayBuffer(
+                                    /Chrome\/145/.test(navigator.userAgent) && codec === 'opus'
+                                        ? `sine-${escapedCodec}.${format}.chrome-developer.wav`
+                                        : `sine-${escapedCodec}.${format}.wav`
+                                ),
                                 loadFixtureAsArrayBuffer(`sine-${escapedCodec}.${container}`),
                                 loadFixtureAsJson(`sine-${escapedCodec}.${container}.json`)
                             ]);
