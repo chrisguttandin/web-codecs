@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { AudioData } from '../../src/module';
 import { computeDelta } from '../helpers/compute-delta';
 import { convertFloat32ToInt16 } from '../../src/functions/convert-float32-to-int16';
@@ -119,23 +120,21 @@ describe('AudioData', () => {
             });
 
             describe('with two references to the same ArrayBuffer', () => {
-                it('should throw a DataCloneError', (done) => {
-                    try {
-                        new AudioData({
-                            data,
-                            format,
-                            numberOfChannels,
-                            numberOfFrames,
-                            sampleRate,
-                            timestamp,
-                            transfer: [data.buffer, data.buffer]
-                        });
-                    } catch (err) {
-                        expect(err.code).to.equal(25);
-                        expect(err.name).to.equal('DataCloneError');
-
-                        done();
-                    }
+                it('should throw a DataCloneError', () => {
+                    expect(
+                        () =>
+                            new AudioData({
+                                data,
+                                format,
+                                numberOfChannels,
+                                numberOfFrames,
+                                sampleRate,
+                                timestamp,
+                                transfer: [data.buffer, data.buffer]
+                            })
+                    )
+                        .to.throw(DOMException)
+                        .to.include({ code: 25, name: 'DataCloneError' });
                 });
             });
 
@@ -147,23 +146,21 @@ describe('AudioData', () => {
                     port1.close();
                 });
 
-                it('should throw a DataCloneError', (done) => {
-                    try {
-                        new AudioData({
-                            data,
-                            format,
-                            numberOfChannels,
-                            numberOfFrames,
-                            sampleRate,
-                            timestamp,
-                            transfer: [data.buffer]
-                        });
-                    } catch (err) {
-                        expect(err.code).to.equal(25);
-                        expect(err.name).to.equal('DataCloneError');
-
-                        done();
-                    }
+                it('should throw a DataCloneError', () => {
+                    expect(
+                        () =>
+                            new AudioData({
+                                data,
+                                format,
+                                numberOfChannels,
+                                numberOfFrames,
+                                sampleRate,
+                                timestamp,
+                                transfer: [data.buffer]
+                            })
+                    )
+                        .to.throw(DOMException)
+                        .to.include({ code: 25, name: 'DataCloneError' });
                 });
             });
 
@@ -1076,15 +1073,10 @@ describe('AudioData', () => {
                 audioData.close();
             });
 
-            it('should throw an InvalidStateError', (done) => {
-                try {
-                    audioData.allocationSize({ format: 'f32-planar', planeIndex: 0 });
-                } catch (err) {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                }
+            it('should throw an InvalidStateError', () => {
+                expect(() => audioData.allocationSize({ format: 'f32-planar', planeIndex: 0 }))
+                    .to.throw(DOMException)
+                    .to.include({ code: 11, name: 'InvalidStateError' });
             });
         });
     });
@@ -1173,15 +1165,10 @@ describe('AudioData', () => {
                 audioData.close();
             });
 
-            it('should throw an InvalidStateError', (done) => {
-                try {
-                    audioData.clone();
-                } catch (err) {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                }
+            it('should throw an InvalidStateError', () => {
+                expect(() => audioData.clone())
+                    .to.throw(DOMException)
+                    .to.include({ code: 11, name: 'InvalidStateError' });
             });
         });
     });
@@ -2666,15 +2653,10 @@ describe('AudioData', () => {
                 audioData.close();
             });
 
-            it('should throw an InvalidStateError', (done) => {
-                try {
-                    audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 });
-                } catch (err) {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                }
+            it('should throw an InvalidStateError', () => {
+                expect(() => audioData.copyTo(destination, { format: 'f32-planar', planeIndex: 0 }))
+                    .to.throw(DOMException)
+                    .to.include({ code: 11, name: 'InvalidStateError' });
             });
         });
     });

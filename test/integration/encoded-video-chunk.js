@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { EncodedVideoChunk } from '../../src/module';
 
 describe('EncodedVideoChunk', () => {
@@ -75,21 +76,19 @@ describe('EncodedVideoChunk', () => {
             });
 
             describe('with two references to the same ArrayBuffer', () => {
-                it('should throw a DataCloneError', (done) => {
-                    try {
-                        new EncodedVideoChunk({
-                            data,
-                            duration,
-                            timestamp,
-                            transfer: [data.buffer, data.buffer],
-                            type
-                        });
-                    } catch (err) {
-                        expect(err.code).to.equal(25);
-                        expect(err.name).to.equal('DataCloneError');
-
-                        done();
-                    }
+                it('should throw a DataCloneError', () => {
+                    expect(
+                        () =>
+                            new EncodedVideoChunk({
+                                data,
+                                duration,
+                                timestamp,
+                                transfer: [data.buffer, data.buffer],
+                                type
+                            })
+                    )
+                        .to.throw(DOMException)
+                        .to.include({ code: 25, name: 'DataCloneError' });
                 });
             });
 
@@ -101,21 +100,19 @@ describe('EncodedVideoChunk', () => {
                     port1.close();
                 });
 
-                it('should throw a DataCloneError', (done) => {
-                    try {
-                        new EncodedVideoChunk({
-                            data,
-                            duration,
-                            timestamp,
-                            transfer: [data.buffer],
-                            type
-                        });
-                    } catch (err) {
-                        expect(err.code).to.equal(25);
-                        expect(err.name).to.equal('DataCloneError');
-
-                        done();
-                    }
+                it('should throw a DataCloneError', () => {
+                    expect(
+                        () =>
+                            new EncodedVideoChunk({
+                                data,
+                                duration,
+                                timestamp,
+                                transfer: [data.buffer],
+                                type
+                            })
+                    )
+                        .to.throw(DOMException)
+                        .to.include({ code: 25, name: 'DataCloneError' });
                 });
             });
 

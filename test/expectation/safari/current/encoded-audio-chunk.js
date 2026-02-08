@@ -1,3 +1,5 @@
+import { describe, it } from 'vitest';
+
 describe('EncodedAudioChunk', () => {
     describe('constructor', () => {
         describe('with a missing timestamp property', () => {

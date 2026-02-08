@@ -1,4 +1,5 @@
 import { AudioData, AudioDecoder, AudioEncoder, EncodedAudioChunk } from '../../src/module';
+import { describe, expect, it } from 'vitest';
 
 describe('module', () => {
     it('should export the AudioData constructor', () => {

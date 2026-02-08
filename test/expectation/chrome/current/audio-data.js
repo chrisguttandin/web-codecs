@@ -1,24 +1,24 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+
 describe('AudioData', () => {
     describe('with a sampleRate below zero', () => {
         // bug #2
 
-        it('should throw a NotSupportedError', (done) => {
-            try {
-                // eslint-disable-next-line no-undef
-                new AudioData({
-                    data: new Float32Array(200),
-                    format: 'f32-planar',
-                    numberOfChannels: 2,
-                    numberOfFrames: 100,
-                    sampleRate: -10,
-                    timestamp: 1234
-                });
-            } catch (err) {
-                expect(err.code).to.equal(9);
-                expect(err.name).to.equal('NotSupportedError');
-
-                done();
-            }
+        it('should throw a NotSupportedError', () => {
+            expect(
+                () =>
+                    // eslint-disable-next-line no-undef
+                    new AudioData({
+                        data: new Float32Array(200),
+                        format: 'f32-planar',
+                        numberOfChannels: 2,
+                        numberOfFrames: 100,
+                        sampleRate: -10,
+                        timestamp: 1234
+                    })
+            )
+                .to.throw(DOMException)
+                .with.property('name', 'NotSupportedError');
         });
     });
 

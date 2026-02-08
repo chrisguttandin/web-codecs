@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { VORBIS_DESCRIPTION } from '../../../helpers/vorbis-description';
 import { loadFixtureAsArrayBuffer } from '../../../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../../../helpers/load-fixture-as-json';

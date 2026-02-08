@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { computeCopyElementCount } from '../../../src/functions/compute-copy-element-count';
 
 describe('computeCopyElementCount()', () => {

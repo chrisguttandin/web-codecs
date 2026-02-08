@@ -1,0 +1,25 @@
+import { webdriverio } from '@vitest/browser-webdriverio';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+    test: {
+        bail: 1,
+        browser: {
+            enabled: true,
+            instances: [
+                {
+                    browser: 'firefox',
+                    headless: true,
+                    name: 'Firefox',
+                    provider: webdriverio({
+                        capabilities: { 'moz:firefoxOptions': { binary: 'firefox-v145/firefox/Firefox.app/Contents/MacOS/firefox' } }
+                    })
+                }
+            ]
+        },
+        dir: 'test/expectation/firefox/previous/',
+        include: ['**/*.js'],
+        setupFiles: ['config/vitest/expectation-firefox-previous-setup.ts'],
+        watch: false
+    }
+});

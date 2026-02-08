@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 describe('AudioData', () => {
     // bug #1
 

@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+
 describe('EncodedAudioChunk', () => {
     describe('with multiple references to the same ArrayBuffer', () => {
         // bug #16

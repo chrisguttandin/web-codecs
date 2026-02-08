@@ -1,4 +1,5 @@
 import { AudioData, AudioDecoder, EncodedAudioChunk } from '../../src/module';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { spy, stub } from 'sinon';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
 import { VORBIS_DESCRIPTION } from '../helpers/vorbis-description';
@@ -27,62 +28,80 @@ describe('AudioDecoder', () => {
 
     describe('isConfigSupported()', () => {
         describe('with an empty codec', () => {
-            it('should throw a TypeError', (done) => {
-                AudioDecoder.isConfigSupported({ codec: '' }).catch((err) => {
-                    expect(err).to.be.an.instanceOf(TypeError);
-
-                    done();
-                });
+            it('should throw a TypeError', () => {
+                return AudioDecoder.isConfigSupported({ codec: '' }).then(
+                    () => {
+                        throw new Error('This should never be called.');
+                    },
+                    (err) => {
+                        expect(err).to.be.an.instanceOf(TypeError);
+                    }
+                );
             });
         });
 
         describe('with an unknown codec', () => {
-            it('should throw a TypeError', (done) => {
-                AudioDecoder.isConfigSupported({ codec: 'bogus' }).catch((err) => {
-                    expect(err).to.be.an.instanceOf(TypeError);
-
-                    done();
-                });
+            it('should throw a TypeError', () => {
+                return AudioDecoder.isConfigSupported({ codec: 'bogus' }).then(
+                    () => {
+                        throw new Error('This should never be called.');
+                    },
+                    (err) => {
+                        expect(err).to.be.an.instanceOf(TypeError);
+                    }
+                );
             });
         });
 
         describe('with a video codec', () => {
-            it('should throw a TypeError', (done) => {
-                AudioDecoder.isConfigSupported({ codec: 'vp8' }).catch((err) => {
-                    expect(err).to.be.an.instanceOf(TypeError);
-
-                    done();
-                });
+            it('should throw a TypeError', () => {
+                return AudioDecoder.isConfigSupported({ codec: 'vp8' }).then(
+                    () => {
+                        throw new Error('This should never be called.');
+                    },
+                    (err) => {
+                        expect(err).to.be.an.instanceOf(TypeError);
+                    }
+                );
             });
         });
 
         describe('with an ambiguous codec', () => {
-            it('should throw a TypeError', (done) => {
-                AudioDecoder.isConfigSupported({ codec: 'vp9' }).catch((err) => {
-                    expect(err).to.be.an.instanceOf(TypeError);
-
-                    done();
-                });
+            it('should throw a TypeError', () => {
+                return AudioDecoder.isConfigSupported({ codec: 'vp9' }).then(
+                    () => {
+                        throw new Error('This should never be called.');
+                    },
+                    (err) => {
+                        expect(err).to.be.an.instanceOf(TypeError);
+                    }
+                );
             });
         });
 
         describe('with a MIME type as codec', () => {
-            it('should throw a TypeError', (done) => {
-                AudioDecoder.isConfigSupported({ codec: "audio/webm; codecs='opus'" }).catch((err) => {
-                    expect(err).to.be.an.instanceOf(TypeError);
-
-                    done();
-                });
+            it('should throw a TypeError', () => {
+                return AudioDecoder.isConfigSupported({ codec: "audio/webm; codecs='opus'" }).then(
+                    () => {
+                        throw new Error('This should never be called.');
+                    },
+                    (err) => {
+                        expect(err).to.be.an.instanceOf(TypeError);
+                    }
+                );
             });
         });
 
         describe('with a codec with spaces', () => {
-            it('should throw a TypeError', (done) => {
-                AudioDecoder.isConfigSupported({ codec: '  mp3  ' }).catch((err) => {
-                    expect(err).to.be.an.instanceOf(TypeError);
-
-                    done();
-                });
+            it('should throw a TypeError', () => {
+                return AudioDecoder.isConfigSupported({ codec: '  mp3  ' }).then(
+                    () => {
+                        throw new Error('This should never be called.');
+                    },
+                    (err) => {
+                        expect(err).to.be.an.instanceOf(TypeError);
+                    }
+                );
             });
         });
 
@@ -323,15 +342,10 @@ describe('AudioDecoder', () => {
         describe('with a closed AudioDecoder', () => {
             beforeEach(() => audioDecoder.close());
 
-            it('should throw an InvalidStateError', (done) => {
-                try {
-                    audioDecoder.close();
-                } catch (err) {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                }
+            it('should throw an InvalidStateError', () => {
+                expect(() => audioDecoder.close())
+                    .to.throw(DOMException)
+                    .to.include({ code: 11, name: 'InvalidStateError' });
             });
         });
     });
@@ -362,13 +376,17 @@ describe('AudioDecoder', () => {
                     expect(() => audioDecoder.configure({ codec })).to.throw(TypeError);
                 });
 
-                it('should not change the state', (done) => {
+                it('should not change the state', () => {
+                    const fakeError = new Error('This should never be called.');
+
                     try {
                         audioDecoder.configure({ codec });
-                    } catch {
-                        expect(audioDecoder.state).to.equal('unconfigured');
 
-                        done();
+                        throw fakeError;
+                    } catch (err) {
+                        expect(err).to.not.equal(fakeError);
+
+                        expect(audioDecoder.state).to.equal('unconfigured');
                     }
                 });
             });
@@ -382,13 +400,17 @@ describe('AudioDecoder', () => {
                     expect(() => audioDecoder.configure({ codec })).to.throw(TypeError);
                 });
 
-                it('should not change the state', (done) => {
+                it('should not change the state', () => {
+                    const fakeError = new Error('This should never be called.');
+
                     try {
                         audioDecoder.configure({ codec });
-                    } catch {
-                        expect(audioDecoder.state).to.equal('unconfigured');
 
-                        done();
+                        throw fakeError;
+                    } catch (err) {
+                        expect(err).to.not.equal(fakeError);
+
+                        expect(audioDecoder.state).to.equal('unconfigured');
                     }
                 });
             });
@@ -402,13 +424,17 @@ describe('AudioDecoder', () => {
                     expect(() => audioDecoder.configure({ codec })).to.throw(TypeError);
                 });
 
-                it('should not change the state', (done) => {
+                it('should not change the state', () => {
+                    const fakeError = new Error('This should never be called.');
+
                     try {
                         audioDecoder.configure({ codec });
-                    } catch {
-                        expect(audioDecoder.state).to.equal('unconfigured');
 
-                        done();
+                        throw fakeError;
+                    } catch (err) {
+                        expect(err).to.not.equal(fakeError);
+
+                        expect(audioDecoder.state).to.equal('unconfigured');
                     }
                 });
             });
@@ -422,13 +448,17 @@ describe('AudioDecoder', () => {
                     expect(() => audioDecoder.configure({ codec })).to.throw(TypeError);
                 });
 
-                it('should not change the state', (done) => {
+                it('should not change the state', () => {
+                    const fakeError = new Error('This should never be called.');
+
                     try {
                         audioDecoder.configure({ codec });
-                    } catch {
-                        expect(audioDecoder.state).to.equal('unconfigured');
 
-                        done();
+                        throw fakeError;
+                    } catch (err) {
+                        expect(err).to.not.equal(fakeError);
+
+                        expect(audioDecoder.state).to.equal('unconfigured');
                     }
                 });
             });
@@ -442,13 +472,17 @@ describe('AudioDecoder', () => {
                     expect(() => audioDecoder.configure({ codec })).to.throw(TypeError);
                 });
 
-                it('should not change the state', (done) => {
+                it('should not change the state', () => {
+                    const fakeError = new Error('This should never be called.');
+
                     try {
                         audioDecoder.configure({ codec });
-                    } catch {
-                        expect(audioDecoder.state).to.equal('unconfigured');
 
-                        done();
+                        throw fakeError;
+                    } catch (err) {
+                        expect(err).to.not.equal(fakeError);
+
+                        expect(audioDecoder.state).to.equal('unconfigured');
                     }
                 });
             });
@@ -462,13 +496,17 @@ describe('AudioDecoder', () => {
                     expect(() => audioDecoder.configure({ codec })).to.throw(TypeError);
                 });
 
-                it('should not change the state', (done) => {
+                it('should not change the state', () => {
+                    const fakeError = new Error('This should never be called.');
+
                     try {
                         audioDecoder.configure({ codec });
-                    } catch {
-                        expect(audioDecoder.state).to.equal('unconfigured');
 
-                        done();
+                        throw fakeError;
+                    } catch (err) {
+                        expect(err).to.not.equal(fakeError);
+
+                        expect(audioDecoder.state).to.equal('unconfigured');
                     }
                 });
             });
@@ -667,19 +705,16 @@ describe('AudioDecoder', () => {
         describe('with a closed AudioDecoder', () => {
             beforeEach(() => audioDecoder.close());
 
-            it('should throw an InvalidStateError', (done) => {
-                try {
+            it('should throw an InvalidStateError', () => {
+                expect(() =>
                     audioDecoder.configure({
                         codec: 'mp4a.40.2',
                         numberOfChannels: 1,
                         sampleRate: 48000
-                    });
-                } catch (err) {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                }
+                    })
+                )
+                    .to.throw(DOMException)
+                    .to.include({ code: 11, name: 'InvalidStateError' });
             });
         });
     });
@@ -703,15 +738,10 @@ describe('AudioDecoder', () => {
         });
 
         describe('with an unconfigured AudioDecoder', () => {
-            it('should throw an InvalidStateError', (done) => {
-                try {
-                    audioDecoder.decode(encodedAudioChunk);
-                } catch (err) {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                }
+            it('should throw an InvalidStateError', () => {
+                expect(() => audioDecoder.decode(encodedAudioChunk))
+                    .to.throw(DOMException)
+                    .to.include({ code: 11, name: 'InvalidStateError' });
             });
         });
 
@@ -878,8 +908,7 @@ describe('AudioDecoder', () => {
                                             );
                                         }
 
-                                        // eslint-disable-next-line no-undef
-                                        if (!process.env.CI && duration > 0) {
+                                        if (duration > 0) {
                                             const uint8Array = new Uint8Array(audioData.allocationSize({ format, planeIndex: 0 }));
 
                                             audioData.copyTo(uint8Array, { format, planeIndex: 0 });
@@ -924,15 +953,10 @@ describe('AudioDecoder', () => {
         describe('with a closed AudioDecoder', () => {
             beforeEach(() => audioDecoder.close());
 
-            it('should throw an InvalidStateError', (done) => {
-                try {
-                    audioDecoder.decode(encodedAudioChunk);
-                } catch (err) {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                }
+            it('should throw an InvalidStateError', () => {
+                expect(() => audioDecoder.decode(encodedAudioChunk))
+                    .to.throw(DOMException)
+                    .to.include({ code: 11, name: 'InvalidStateError' });
             });
         });
     });
@@ -954,13 +978,16 @@ describe('AudioDecoder', () => {
         });
 
         describe('with an unconfigured AudioDecoder', () => {
-            it('should throw an InvalidStateError', (done) => {
-                audioDecoder.flush().catch((err) => {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                });
+            it('should throw an InvalidStateError', () => {
+                return audioDecoder.flush().then(
+                    () => {
+                        throw new Error('This should never be called.');
+                    },
+                    (err) => {
+                        expect(err.code).to.equal(11);
+                        expect(err.name).to.equal('InvalidStateError');
+                    }
+                );
             });
         });
 
@@ -1003,13 +1030,16 @@ describe('AudioDecoder', () => {
         describe('with a closed AudioDecoder', () => {
             beforeEach(() => audioDecoder.close());
 
-            it('should throw an InvalidStateError', (done) => {
-                audioDecoder.flush().catch((err) => {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                });
+            it('should throw an InvalidStateError', () => {
+                return audioDecoder.flush().then(
+                    () => {
+                        throw new Error('This should never be called.');
+                    },
+                    (err) => {
+                        expect(err.code).to.equal(11);
+                        expect(err.name).to.equal('InvalidStateError');
+                    }
+                );
             });
         });
     });
@@ -1079,24 +1109,23 @@ describe('AudioDecoder', () => {
         describe('with a closed AudioDecoder', () => {
             beforeEach(() => audioDecoder.close());
 
-            it('should throw an InvalidStateError', (done) => {
-                try {
-                    audioDecoder.reset();
-                } catch (err) {
-                    expect(err.code).to.equal(11);
-                    expect(err.name).to.equal('InvalidStateError');
-
-                    done();
-                }
+            it('should throw an InvalidStateError', () => {
+                expect(() => audioDecoder.reset())
+                    .to.throw(DOMException)
+                    .to.include({ code: 11, name: 'InvalidStateError' });
             });
 
-            it('should not change the state', (done) => {
+            it('should not change the state', () => {
+                const fakeError = new Error('This should never be called.');
+
                 try {
                     audioDecoder.reset();
-                } catch {
-                    expect(audioDecoder.state).to.equal('closed');
 
-                    done();
+                    throw fakeError;
+                } catch (err) {
+                    expect(err).to.not.equal(fakeError);
+
+                    expect(audioDecoder.state).to.equal('closed');
                 }
             });
         });
