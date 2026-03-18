@@ -802,8 +802,8 @@ describe('AudioDecoder', () => {
 
                             [decodedArrayBuffer, encodedArrayBuffer, json] = await Promise.all([
                                 loadFixtureAsArrayBuffer(
-                                    /Chrome\/147/.test(navigator.userAgent) && codec === 'opus'
-                                        ? `sine-${escapedCodec}.${format}.chrome-canary.wav`
+                                    /Chrome/.test(navigator.userAgent) && codec === 'opus'
+                                        ? `sine-${escapedCodec}.${format}.chrome.wav`
                                         : `sine-${escapedCodec}.${format}.wav`
                                 ),
                                 loadFixtureAsArrayBuffer(`sine-${escapedCodec}.${container}`),
