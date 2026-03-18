@@ -12,7 +12,7 @@ export default defineConfig({
                     headless: true,
                     name: 'Chrome',
                     provider: webdriverio({
-                        capabilities: { 'goog:chromeOptions': { binary: 'chromium-v141/chrome-mac/Chromium.app/Contents/MacOS/Chromium' } }
+                        capabilities: { 'goog:chromeOptions': { binary: 'chromium-v142/chrome-mac/Chromium.app/Contents/MacOS/Chromium' } }
                     })
                 }
             ]
