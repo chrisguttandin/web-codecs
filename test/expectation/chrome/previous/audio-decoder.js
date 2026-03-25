@@ -1,7 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadFixtureAsArrayBuffer } from '../../../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../../../helpers/load-fixture-as-json';
-import { stub } from 'sinon';
 
 describe('AudioDecoder', () => {
     describe('with a flac file', () => {
@@ -17,7 +16,7 @@ describe('AudioDecoder', () => {
                 loadFixtureAsJson(`sine-flac.flac.json`)
             ]);
 
-            output = stub();
+            output = vi.fn();
         });
 
         it('should emit an instance of AudioData with a wrong timestamp', async () => {
@@ -49,11 +48,11 @@ describe('AudioDecoder', () => {
 
             await audioDecoder.flush();
 
-            output.getCalls().reduce((timestamp, call, index) => {
+            output.mock.calls.reduce((timestamp, [audioData], index) => {
                 if (timestamp === 4128000) {
-                    expect(call.args[0].timestamp).to.equal(4127999);
+                    expect(audioData.timestamp).to.equal(4127999);
                 } else {
-                    expect(call.args[0].timestamp).to.equal(timestamp);
+                    expect(audioData.timestamp).to.equal(timestamp);
                 }
 
                 return timestamp + json.audioDatas[index].duration;

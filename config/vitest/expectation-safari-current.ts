@@ -7,7 +7,6 @@ export default defineConfig({
         browser: { enabled: true, instances: [{ browser: 'safari', name: 'Safari', provider: webdriverio() }] },
         dir: 'test/expectation/safari/current/',
         include: ['**/*.js'],
-        setupFiles: ['config/vitest/expectation-safari-current-setup.ts'],
         watch: false
     }
 });

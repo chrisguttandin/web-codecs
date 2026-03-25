@@ -1,7 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadFixtureAsArrayBuffer } from '../../../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../../../helpers/load-fixture-as-json';
-import { stub } from 'sinon';
 
 describe('AudioDecoder', () => {
     for (const codec of ['alaw', 'ulaw']) {
@@ -18,7 +17,7 @@ describe('AudioDecoder', () => {
                     loadFixtureAsJson(`sine-${codec}.wav.json`)
                 ]);
 
-                output = stub();
+                output = vi.fn();
             });
 
             it('should emit multiple instances of the AudioData constructor with a maximum numberOfFrames and a wrong timestamp', async () => {
@@ -47,14 +46,10 @@ describe('AudioDecoder', () => {
 
                 await audioDecoder.flush();
 
-                const calls = output.getCalls();
-
-                expect(calls.length).to.equal(118);
+                expect(output.mock.calls.length).to.equal(118);
                 expect(
-                    calls.reduce(
-                        ([duration, numberOfFrames], call) => {
-                            const [audioData] = call.args;
-
+                    output.mock.calls.reduce(
+                        ([duration, numberOfFrames], [audioData]) => {
                             expect(audioData.duration).to.be.at.most(42666);
                             expect(audioData.numberOfFrames).to.be.at.most(2048);
 
@@ -88,7 +83,7 @@ describe('AudioDecoder', () => {
                 loadFixtureAsJson(`sine-mp3.mp3.json`)
             ]);
 
-            output = stub();
+            output = vi.fn();
         });
 
         it('should skip the decoder delay', async () => {
@@ -117,12 +112,9 @@ describe('AudioDecoder', () => {
 
             await audioDecoder.flush();
 
-            const calls = output.getCalls();
+            expect(output.mock.calls.length).to.equal(json.audioDatas.length + 1);
 
-            expect(calls.length).to.equal(json.audioDatas.length + 1);
-
-            calls.forEach((call, index) => {
-                const [audioData] = call.args;
+            output.mock.calls.forEach(([audioData], index) => {
                 const numberOfFrames = (json.audioDatas[index]?.numberOfFrames ?? 529) - (index === 0 ? 529 : 0);
 
                 expect(audioData.numberOfFrames).to.equal(numberOfFrames);
@@ -144,8 +136,8 @@ describe('AudioDecoder', () => {
                 loadFixtureAsJson(`sine-flac.flac.json`)
             ]);
 
-            error = stub();
-            output = stub();
+            error = vi.fn();
+            output = vi.fn();
         });
 
         it('should throw an error', async () => {
@@ -179,11 +171,14 @@ describe('AudioDecoder', () => {
 
             expect(error).to.have.been.calledOnce;
 
-            const { args } = error.getCall(0);
+            const [args] = error.mock.calls;
 
             expect(args.length).to.equal(1);
-            expect(args[0].code).to.equal(0);
-            expect(args[0].name).to.equal('EncodingError');
+
+            const [err] = args;
+
+            expect(err.code).to.equal(0);
+            expect(err.name).to.equal('EncodingError');
 
             expect(output).to.have.not.been.called;
         });

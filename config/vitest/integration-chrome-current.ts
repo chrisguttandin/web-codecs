@@ -7,7 +7,6 @@ export default defineConfig({
         browser: { enabled: true, instances: [{ browser: 'chrome', headless: true, name: 'Chrome', provider: webdriverio() }] },
         dir: 'test/integration/',
         include: ['**/*.js'],
-        setupFiles: ['config/vitest/integration-setup.ts'],
         watch: false
     }
 });

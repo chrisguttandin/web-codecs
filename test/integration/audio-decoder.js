@@ -1,6 +1,5 @@
 import { AudioData, AudioDecoder, EncodedAudioChunk } from '../../src/module';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { spy, stub } from 'sinon';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
 import { VORBIS_DESCRIPTION } from '../helpers/vorbis-description';
 import { computeDelta } from '../helpers/compute-delta';
@@ -19,11 +18,11 @@ describe('AudioDecoder', () => {
     let output;
 
     beforeEach(() => {
-        error = stub();
-        output = stub();
+        error = vi.fn();
+        output = vi.fn();
 
-        error.throws(new Error('error: This should never be called.'));
-        output.throws(new Error('output: This should never be called.'));
+        error.mockThrow(new Error('error: This should never be called.'));
+        output.mockThrow(new Error('output: This should never be called.'));
     });
 
     describe('isConfigSupported()', () => {
@@ -133,7 +132,7 @@ describe('AudioDecoder', () => {
                             };
                         }
 
-                        error.resetBehavior();
+                        error.mockReset();
                     });
 
                     describe('with a valid AudioDecoderConfig', () => {
@@ -266,7 +265,7 @@ describe('AudioDecoder', () => {
         });
 
         it('should register an independent event listener', () => {
-            const ondequeue = spy();
+            const ondequeue = vi.fn();
 
             audioDecoder.ondequeue = ondequeue;
             audioDecoder.addEventListener('dequeue', ondequeue);
@@ -539,7 +538,7 @@ describe('AudioDecoder', () => {
                                 };
                             }
 
-                            error.resetBehavior();
+                            error.mockReset();
                         });
 
                         if (filterSupportedAudioCodecsForDecoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
@@ -579,11 +578,14 @@ describe('AudioDecoder', () => {
 
                                 expect(error).to.have.been.calledOnce;
 
-                                const { args } = error.getCall(0);
+                                const [args] = error.mock.calls;
 
                                 expect(args.length).to.equal(1);
-                                expect(args[0].code).to.equal(9);
-                                expect(args[0].name).to.equal('NotSupportedError');
+
+                                const [err] = args;
+
+                                expect(err.code).to.equal(9);
+                                expect(err.name).to.equal('NotSupportedError');
                             });
 
                             it('should change the state', async () => {
@@ -639,7 +641,7 @@ describe('AudioDecoder', () => {
                                 setTimeout(resolve);
                             });
 
-                            error.resetBehavior();
+                            error.mockReset();
                         });
 
                         if (filterSupportedAudioCodecsForDecoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
@@ -678,11 +680,14 @@ describe('AudioDecoder', () => {
 
                                 expect(error).to.have.been.calledOnce;
 
-                                const { args } = error.getCall(0);
+                                const [args] = error.mock.calls;
 
                                 expect(args.length).to.equal(1);
-                                expect(args[0].code).to.equal(9);
-                                expect(args[0].name).to.equal('NotSupportedError');
+
+                                const [err] = args;
+
+                                expect(err.code).to.equal(9);
+                                expect(err.name).to.equal('NotSupportedError');
                             });
 
                             it('should change the state', async () => {
@@ -747,7 +752,7 @@ describe('AudioDecoder', () => {
 
         describe('with a configured AudioDecoder', () => {
             beforeEach(() => {
-                output.resetBehavior();
+                output.mockReset();
             });
 
             describe('with a known and supported codec', () => {
@@ -840,8 +845,6 @@ describe('AudioDecoder', () => {
 
                                     await audioDecoder.flush();
 
-                                    const calls = output.getCalls();
-
                                     if (navigator.userAgent.includes('Firefox') && codec === 'vorbis') {
                                         json.audioDatas.unshift({ data: [58, 58], duration: 0, numberOfFrames: 0 });
                                     }
@@ -876,12 +879,12 @@ describe('AudioDecoder', () => {
                                         );
                                     }
 
-                                    expect(calls.length).to.equal(json.audioDatas.length);
+                                    expect(output.mock.calls.length).to.equal(json.audioDatas.length);
 
-                                    calls.reduce((totalNumberOfFrames, call, index) => {
-                                        expect(call.args.length).to.equal(1);
+                                    output.mock.calls.reduce((totalNumberOfFrames, args, index) => {
+                                        expect(args.length).to.equal(1);
 
-                                        const [audioData] = call.args;
+                                        const [audioData] = args;
 
                                         expect(audioData).to.be.an.instanceOf(AudioData);
 

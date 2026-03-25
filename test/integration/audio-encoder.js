@@ -1,6 +1,5 @@
 import { AudioData, AudioEncoder, EncodedAudioChunk } from '../../src/module';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { spy, stub } from 'sinon';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { KNOWN_AUDIO_CODECS } from '../../src/constants/known-audio-codecs';
 import { filterSupportedAudioCodecsForEncoding } from '../helpers/filter-supported-audio-codecs-for-encoding';
 import { isSafari } from '../helpers/is-safari';
@@ -12,11 +11,11 @@ describe('AudioEncoder', () => {
     let output;
 
     beforeEach(() => {
-        error = stub();
-        output = stub();
+        error = vi.fn();
+        output = vi.fn();
 
-        error.throws(new Error('This should never be called.'));
-        output.throws(new Error('This should never be called.'));
+        error.mockThrow(new Error('This should never be called.'));
+        output.mockThrow(new Error('This should never be called.'));
     });
 
     describe('isConfigSupported()', () => {
@@ -110,7 +109,7 @@ describe('AudioEncoder', () => {
                             sampleRate: 48000
                         };
 
-                        error.resetBehavior();
+                        error.mockReset();
                     });
 
                     describe('with a missing numberOfChannels property', () => {
@@ -331,7 +330,7 @@ describe('AudioEncoder', () => {
         });
 
         it('should register an independent event listener', () => {
-            const ondequeue = spy();
+            const ondequeue = vi.fn();
 
             audioEncoder.ondequeue = ondequeue;
             audioEncoder.addEventListener('dequeue', ondequeue);
@@ -719,7 +718,7 @@ describe('AudioEncoder', () => {
 
                         describe('with a valid AudioEncoderConfig', () => {
                             beforeEach(() => {
-                                error.resetBehavior();
+                                error.mockReset();
                             });
 
                             if (filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
@@ -758,11 +757,14 @@ describe('AudioEncoder', () => {
 
                                     expect(error).to.have.been.calledOnce;
 
-                                    const { args } = error.getCall(0);
+                                    const [args] = error.mock.calls;
 
                                     expect(args.length).to.equal(1);
-                                    expect(args[0].code).to.equal(9);
-                                    expect(args[0].name).to.equal('NotSupportedError');
+
+                                    const [err] = args;
+
+                                    expect(err.code).to.equal(9);
+                                    expect(err.name).to.equal('NotSupportedError');
                                 });
 
                                 it('should change the state', async () => {
@@ -802,7 +804,7 @@ describe('AudioEncoder', () => {
                                 setTimeout(resolve);
                             });
 
-                            error.resetBehavior();
+                            error.mockReset();
                         });
 
                         if (filterSupportedAudioCodecsForEncoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
@@ -841,11 +843,14 @@ describe('AudioEncoder', () => {
 
                                 expect(error).to.have.been.calledOnce;
 
-                                const { args } = error.getCall(0);
+                                const [args] = error.mock.calls;
 
                                 expect(args.length).to.equal(1);
-                                expect(args[0].code).to.equal(9);
-                                expect(args[0].name).to.equal('NotSupportedError');
+
+                                const [err] = args;
+
+                                expect(err.code).to.equal(9);
+                                expect(err.name).to.equal('NotSupportedError');
                             });
 
                             it('should change the state', async () => {
@@ -917,7 +922,7 @@ describe('AudioEncoder', () => {
 
         describe('with a configured AudioEncoder', () => {
             beforeEach(() => {
-                output.resetBehavior();
+                output.mockReset();
             });
 
             describe('with a known and supported codec', () => {
@@ -1005,14 +1010,12 @@ describe('AudioEncoder', () => {
 
                             await audioEncoder.flush();
 
-                            const calls = output.getCalls();
+                            expect(output.mock.calls.length).to.equal(json.encodedAudioChunks.length);
 
-                            expect(calls.length).to.equal(json.encodedAudioChunks.length);
+                            output.mock.calls.reduce((timestamp, args, index) => {
+                                expect(args.length).to.equal(2);
 
-                            calls.reduce((timestamp, call, index) => {
-                                expect(call.args.length).to.equal(2);
-
-                                const [encodedAudioChunk, encodedAudioChunkMetadata] = call.args;
+                                const [encodedAudioChunk, encodedAudioChunkMetadata] = args;
 
                                 expect(encodedAudioChunk).to.be.an.instanceOf(EncodedAudioChunk);
 

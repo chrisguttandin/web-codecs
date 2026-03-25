@@ -7,7 +7,6 @@ export default defineConfig({
         browser: { enabled: true, instances: [{ browser: 'chrome', headless: true, name: 'Chrome', provider: webdriverio() }] },
         dir: 'test/expectation/chrome/current/',
         include: ['**/*.js'],
-        setupFiles: ['config/vitest/expectation-chrome-current-setup.ts'],
         watch: false
     }
 });

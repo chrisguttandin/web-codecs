@@ -1,7 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadFixtureAsArrayBuffer } from '../../../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../../../helpers/load-fixture-as-json';
-import { stub } from 'sinon';
 
 describe('AudioEncoder', () => {
     describe('when encoding as opus', () => {
@@ -17,7 +16,7 @@ describe('AudioEncoder', () => {
                 loadFixtureAsJson(`sine-pcm-s16.opus.firefox.json`)
             ]);
 
-            output = stub();
+            output = vi.fn();
         });
 
         it('should emit multiple instances of the EncodedAudioChunk constructor with a wrong timestamp', async () => {
@@ -48,8 +47,7 @@ describe('AudioEncoder', () => {
 
             await audioEncoder.flush();
 
-            output.getCalls().reduce((timestamp, call, index) => {
-                const [encodedAudioChunk] = call.args;
+            output.mock.calls.reduce((timestamp, [encodedAudioChunk], index) => {
                 const { duration } = json.encodedAudioChunks[index];
 
                 expect(encodedAudioChunk.timestamp).to.equal(Math.max(0, timestamp - 6500));
@@ -72,7 +70,7 @@ describe('AudioEncoder', () => {
                 loadFixtureAsJson(`sine-pcm-s16.vorbis.json`)
             ]);
 
-            output = stub();
+            output = vi.fn();
         });
 
         it('should emit multiple instances of the EncodedAudioChunk constructor with a wrong duration', async () => {
@@ -103,8 +101,7 @@ describe('AudioEncoder', () => {
 
             await audioEncoder.flush();
 
-            output.getCalls().forEach((call, index) => {
-                const [encodedAudioChunk] = call.args;
+            output.mock.calls.forEach(([encodedAudioChunk], index) => {
                 const { duration } = json.encodedAudioChunks[index];
 
                 expect(encodedAudioChunk.duration).to.not.equal(duration);

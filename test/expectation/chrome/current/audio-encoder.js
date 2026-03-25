@@ -1,7 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadFixtureAsArrayBuffer } from '../../../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../../../helpers/load-fixture-as-json';
-import { spy } from 'sinon';
 
 describe('AudioEncoder', () => {
     describe('isConfigSupported()', () => {
@@ -33,7 +32,7 @@ describe('AudioEncoder', () => {
         let error;
 
         beforeEach(() => {
-            error = spy();
+            error = vi.fn();
 
             // eslint-disable-next-line no-undef
             audioEncoder = new AudioEncoder({
@@ -64,11 +63,14 @@ describe('AudioEncoder', () => {
 
                 expect(error).to.have.been.calledOnce;
 
-                const { args } = error.getCall(0);
+                const [args] = error.mock.calls;
 
                 expect(args.length).to.equal(1);
-                expect(args[0].code).to.equal(9);
-                expect(args[0].name).to.equal('NotSupportedError');
+
+                const [err] = args;
+
+                expect(err.code).to.equal(9);
+                expect(err.name).to.equal('NotSupportedError');
             });
 
             it('should change the state', async () => {
@@ -104,11 +106,14 @@ describe('AudioEncoder', () => {
 
                 expect(error).to.have.been.calledOnce;
 
-                const { args } = error.getCall(0);
+                const [args] = error.mock.calls;
 
                 expect(args.length).to.equal(1);
-                expect(args[0].code).to.equal(9);
-                expect(args[0].name).to.equal('NotSupportedError');
+
+                const [err] = args;
+
+                expect(err.code).to.equal(9);
+                expect(err.name).to.equal('NotSupportedError');
             });
 
             it('should change the state', async () => {
@@ -130,7 +135,7 @@ describe('AudioEncoder', () => {
         let output;
 
         beforeEach(() => {
-            output = spy();
+            output = vi.fn();
 
             // eslint-disable-next-line no-undef
             audioEncoder = new AudioEncoder({
@@ -173,11 +178,11 @@ describe('AudioEncoder', () => {
 
                 await audioEncoder.flush();
 
-                output.getCalls().reduce((timestamp, call, index) => {
+                output.mock.calls.reduce((timestamp, [audioData], index) => {
                     if ([260000, 520000, 1040000, 2060000, 2080000, 4100000, 4120000, 4140000, 4160000, 4180000].includes(timestamp)) {
-                        expect(call.args[0].timestamp).to.equal(timestamp - 1);
+                        expect(audioData.timestamp).to.equal(timestamp - 1);
                     } else {
-                        expect(call.args[0].timestamp).to.equal(timestamp);
+                        expect(audioData.timestamp).to.equal(timestamp);
                     }
 
                     return timestamp + json.encodedAudioChunks[index].duration;

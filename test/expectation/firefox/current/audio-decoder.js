@@ -1,8 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { VORBIS_DESCRIPTION } from '../../../helpers/vorbis-description';
 import { loadFixtureAsArrayBuffer } from '../../../helpers/load-fixture-as-array-buffer';
 import { loadFixtureAsJson } from '../../../helpers/load-fixture-as-json';
-import { stub } from 'sinon';
 
 describe('AudioDecoder', () => {
     describe('with an mp4 file', () => {
@@ -18,7 +17,7 @@ describe('AudioDecoder', () => {
                 loadFixtureAsJson(`sine-mp4a-40-2.mp4.json`)
             ]);
 
-            output = stub();
+            output = vi.fn();
         });
 
         it('should emit multiple instances of the AudioData constructor with a wrong timestamp', async () => {
@@ -50,8 +49,7 @@ describe('AudioDecoder', () => {
 
             await audioDecoder.flush();
 
-            output.getCalls().reduce((numberOfFrames, call) => {
-                const [audioData] = call.args;
+            output.mock.calls.reduce((numberOfFrames, [audioData]) => {
                 const timestamp = Math.floor((numberOfFrames * 1000000) / audioData.sampleRate);
 
                 if (timestamp <= 42666) {
@@ -78,7 +76,7 @@ describe('AudioDecoder', () => {
                 loadFixtureAsJson(`sine-vorbis.ogg.json`)
             ]);
 
-            output = stub();
+            output = vi.fn();
         });
 
         it('should emit multiple instances of the AudioData constructor starting with a wrong timestamp', async () => {
@@ -106,7 +104,7 @@ describe('AudioDecoder', () => {
 
             await audioDecoder.flush();
 
-            expect(output.getCalls()[0].args[0].timestamp).to.equal(0);
+            expect(output.mock.calls[0][0].timestamp).to.equal(0);
         });
     });
 });

@@ -23,7 +23,6 @@ export default defineConfig({
         },
         dir: 'test/expectation/chrome/previous/',
         include: ['**/*.js'],
-        setupFiles: ['config/vitest/expectation-chrome-previous-setup.ts'],
         watch: false
     }
 });
