@@ -4,7 +4,6 @@ describe('VideoFrame', () => {
     let videoFrame;
 
     beforeEach(() => {
-        // eslint-disable-next-line no-undef
         videoFrame = new VideoFrame(document.createElement('canvas'), { timestamp: 0 });
     });
 

@@ -775,28 +775,26 @@ describe('AudioDecoder', () => {
                             ].includes(knownAudioCodec)
                     ),
                     navigator.userAgent
-                )
-                    .map((knownAudioCodec) =>
-                        knownAudioCodec === 'alaw'
-                            ? [[knownAudioCodec, 'wav', 's16']]
-                            : knownAudioCodec === 'flac'
-                              ? [[knownAudioCodec, 'flac', 's16']]
-                              : knownAudioCodec === 'mp3'
-                                ? [[knownAudioCodec, 'mp3', 's16-planar']]
-                                : knownAudioCodec === 'mp4a.40.2'
-                                  ? [
-                                        [knownAudioCodec, 'aac', 'f32-planar'],
-                                        [knownAudioCodec, 'mp4', 'f32-planar']
-                                    ]
-                                  : knownAudioCodec === 'opus'
-                                    ? [[knownAudioCodec, 'ogg', 'f32']]
-                                    : knownAudioCodec === 'ulaw'
-                                      ? [[knownAudioCodec, 'wav', 's16']]
-                                      : knownAudioCodec === 'vorbis'
-                                        ? [[knownAudioCodec, 'ogg', 'f32-planar']]
-                                        : null
-                    )
-                    .flat()) {
+                ).flatMap((knownAudioCodec) =>
+                    knownAudioCodec === 'alaw'
+                        ? [[knownAudioCodec, 'wav', 's16']]
+                        : knownAudioCodec === 'flac'
+                          ? [[knownAudioCodec, 'flac', 's16']]
+                          : knownAudioCodec === 'mp3'
+                            ? [[knownAudioCodec, 'mp3', 's16-planar']]
+                            : knownAudioCodec === 'mp4a.40.2'
+                              ? [
+                                    [knownAudioCodec, 'aac', 'f32-planar'],
+                                    [knownAudioCodec, 'mp4', 'f32-planar']
+                                ]
+                              : knownAudioCodec === 'opus'
+                                ? [[knownAudioCodec, 'ogg', 'f32']]
+                                : knownAudioCodec === 'ulaw'
+                                  ? [[knownAudioCodec, 'wav', 's16']]
+                                  : knownAudioCodec === 'vorbis'
+                                    ? [[knownAudioCodec, 'ogg', 'f32-planar']]
+                                    : null
+                )) {
                     describe(`with "${codec}" wrapped in "${container}"`, () => {
                         let decodedArrayBuffer;
                         let encodedArrayBuffer;

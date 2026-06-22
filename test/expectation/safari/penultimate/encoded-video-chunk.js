@@ -11,7 +11,6 @@ describe('EncodedVideoChunk', () => {
         });
 
         it('should not throw any error', () => {
-            // eslint-disable-next-line no-undef
             new EncodedVideoChunk({
                 data,
                 timestamp: 0,
@@ -36,7 +35,6 @@ describe('EncodedVideoChunk', () => {
         });
 
         it('should not throw any error', () => {
-            // eslint-disable-next-line no-undef
             new EncodedVideoChunk({
                 data,
                 timestamp: 0,
@@ -56,7 +54,6 @@ describe('EncodedVideoChunk', () => {
         });
 
         it('should not detach an ArrayBuffer', () => {
-            // eslint-disable-next-line no-undef
             new EncodedVideoChunk({
                 data,
                 timestamp: 0,
@@ -72,7 +69,6 @@ describe('EncodedVideoChunk', () => {
         // bug #24
 
         it('should allow to create an EncodedVideoChunk without a timestamp', () => {
-            // eslint-disable-next-line no-undef
             const encodedVideoChunk = new EncodedVideoChunk({ data: new ArrayBuffer(), type: 'key' });
 
             expect(encodedVideoChunk.timestamp).to.equal(0);

@@ -7,7 +7,6 @@ describe('AudioData', () => {
         it('should throw a NotSupportedError', () => {
             expect(
                 () =>
-                    // eslint-disable-next-line no-undef
                     new AudioData({
                         data: new Float32Array(200),
                         format: 'f32-planar',
@@ -39,7 +38,6 @@ describe('AudioData', () => {
         it('should throw a TypeError', () => {
             expect(
                 () =>
-                    // eslint-disable-next-line no-undef
                     new AudioData({
                         data,
                         format: 'f32-planar',

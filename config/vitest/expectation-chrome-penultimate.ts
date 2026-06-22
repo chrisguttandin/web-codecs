@@ -1,6 +1,7 @@
 import { webdriverio } from '@vitest/browser-webdriverio';
 import { defineConfig } from 'vitest/config';
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
     test: {
         bail: 1,
@@ -14,6 +15,7 @@ export default defineConfig({
                     provider: webdriverio({
                         capabilities: {
                             'goog:chromeOptions': {
+                                // eslint-disable-next-line max-len
                                 binary: 'chrome-v147/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing'
                             }
                         }

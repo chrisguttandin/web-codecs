@@ -20,7 +20,6 @@ describe('AudioEncoder', () => {
         });
 
         it('should emit multiple instances of the EncodedAudioChunk constructor with a wrong timestamp', async () => {
-            // eslint-disable-next-line no-undef
             const audioEncoder = new AudioEncoder({
                 error: () => {
                     throw new Error('This should never be called.');
@@ -31,7 +30,6 @@ describe('AudioEncoder', () => {
             audioEncoder.configure(json.config);
             json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                 audioEncoder.encode(
-                    // eslint-disable-next-line no-undef
                     new AudioData({
                         data: decodedArrayBuffer.slice(...data),
                         format: 's16',
@@ -74,7 +72,6 @@ describe('AudioEncoder', () => {
         });
 
         it('should emit multiple instances of the EncodedAudioChunk constructor with a wrong duration', async () => {
-            // eslint-disable-next-line no-undef
             const audioEncoder = new AudioEncoder({
                 error: () => {
                     throw new Error('This should never be called.');
@@ -85,7 +82,6 @@ describe('AudioEncoder', () => {
             audioEncoder.configure(json.config);
             json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                 audioEncoder.encode(
-                    // eslint-disable-next-line no-undef
                     new AudioData({
                         data: decodedArrayBuffer.slice(...data),
                         format: 's16',

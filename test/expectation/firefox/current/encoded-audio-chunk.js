@@ -11,7 +11,6 @@ describe('EncodedAudioChunk', () => {
         });
 
         it('should not throw any error', () => {
-            // eslint-disable-next-line no-undef
             new EncodedAudioChunk({
                 data,
                 timestamp: 0,
@@ -36,7 +35,6 @@ describe('EncodedAudioChunk', () => {
         });
 
         it('should not throw any error', () => {
-            // eslint-disable-next-line no-undef
             new EncodedAudioChunk({
                 data,
                 timestamp: 0,
@@ -56,7 +54,6 @@ describe('EncodedAudioChunk', () => {
         });
 
         it('should not detach an ArrayBuffer', () => {
-            // eslint-disable-next-line no-undef
             new EncodedAudioChunk({
                 data,
                 timestamp: 0,

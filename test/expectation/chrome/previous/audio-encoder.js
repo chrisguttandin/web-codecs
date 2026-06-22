@@ -10,7 +10,6 @@ describe('AudioEncoder', () => {
             it('should return an AudioEncoderSupport object', async () => {
                 const config = { bitrateMode: 'variable', codec: 'alaw', numberOfChannels: 0, sampleRate: 48000 };
 
-                // eslint-disable-next-line no-undef
                 expect(await AudioEncoder.isConfigSupported(config)).to.deep.equal({ config, supported: false });
             });
         });
@@ -21,7 +20,6 @@ describe('AudioEncoder', () => {
             it('should return an AudioEncoderSupport object', async () => {
                 const config = { bitrateMode: 'variable', codec: 'alaw', numberOfChannels: 1, sampleRate: 0 };
 
-                // eslint-disable-next-line no-undef
                 expect(await AudioEncoder.isConfigSupported(config)).to.deep.equal({ config, supported: false });
             });
         });
@@ -34,7 +32,6 @@ describe('AudioEncoder', () => {
         beforeEach(() => {
             error = vi.fn();
 
-            // eslint-disable-next-line no-undef
             audioEncoder = new AudioEncoder({
                 error,
                 output: () => {
@@ -137,7 +134,6 @@ describe('AudioEncoder', () => {
         beforeEach(() => {
             output = vi.fn();
 
-            // eslint-disable-next-line no-undef
             audioEncoder = new AudioEncoder({
                 error: () => {
                     throw new Error('This should never be called.');
@@ -162,7 +158,6 @@ describe('AudioEncoder', () => {
                 audioEncoder.configure(json.config);
                 json.audioDatas.reduce((timestamp, { data, duration, numberOfFrames }) => {
                     audioEncoder.encode(
-                        // eslint-disable-next-line no-undef
                         new AudioData({
                             data: decodedArrayBuffer.slice(...data),
                             format: 's16',
