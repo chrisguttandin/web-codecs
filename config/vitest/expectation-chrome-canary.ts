@@ -14,6 +14,7 @@ export default defineConfig({
                     provider: webdriverio({
                         capabilities: {
                             'goog:chromeOptions': {
+                                args: ['--disable-features=SymphoniaAudioDecoding'],
                                 binary: '/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary'
                             }
                         }
