@@ -135,6 +135,92 @@ describe('AudioDecoder', () => {
                         error.mockReset();
                     });
 
+                    describe('with a missing numberOfChannels property', () => {
+                        beforeEach(() => {
+                            delete config.numberOfChannels;
+                        });
+
+                        it('should throw a TypeError', () => {
+                            return AudioDecoder.isConfigSupported(config).then(
+                                () => {
+                                    throw new Error('This should never be called.');
+                                },
+                                (err) => {
+                                    expect(err).to.be.an.instanceOf(TypeError);
+                                }
+                            );
+                        });
+                    });
+
+                    describe('with a numberOfChannels of zero', () => {
+                        it('should throw a TypeError', () => {
+                            return AudioDecoder.isConfigSupported({ ...config, numberOfChannels: 0 }).then(
+                                () => {
+                                    throw new Error('This should never be called.');
+                                },
+                                (err) => {
+                                    expect(err).to.be.an.instanceOf(TypeError);
+                                }
+                            );
+                        });
+                    });
+
+                    describe('with a numberOfChannels below zero', () => {
+                        it('should throw a TypeError', () => {
+                            return AudioDecoder.isConfigSupported({ ...config, numberOfChannels: -10 }).then(
+                                () => {
+                                    throw new Error('This should never be called.');
+                                },
+                                (err) => {
+                                    expect(err).to.be.an.instanceOf(TypeError);
+                                }
+                            );
+                        });
+                    });
+
+                    describe('with a missing sampleRate property', () => {
+                        beforeEach(() => {
+                            delete config.sampleRate;
+                        });
+
+                        it('should throw a TypeError', () => {
+                            return AudioDecoder.isConfigSupported(config).then(
+                                () => {
+                                    throw new Error('This should never be called.');
+                                },
+                                (err) => {
+                                    expect(err).to.be.an.instanceOf(TypeError);
+                                }
+                            );
+                        });
+                    });
+
+                    describe('with a sampleRate of zero', () => {
+                        it('should throw a TypeError', () => {
+                            return AudioDecoder.isConfigSupported({ ...config, sampleRate: 0 }).then(
+                                () => {
+                                    throw new Error('This should never be called.');
+                                },
+                                (err) => {
+                                    expect(err).to.be.an.instanceOf(TypeError);
+                                }
+                            );
+                        });
+                    });
+
+                    describe('with a sampleRate below zero', () => {
+                        it('should throw a TypeError', () => {
+                            return AudioDecoder.isConfigSupported({ ...config, sampleRate: -10 }).then(
+                                () => {
+                                    throw new Error('This should never be called.');
+                                },
+                                (err) => {
+                                    expect(err).to.be.an.instanceOf(TypeError);
+                                }
+                            );
+                        });
+                    });
+
                     describe('with a valid AudioDecoderConfig', () => {
                         let supported;
 
@@ -537,70 +623,218 @@ describe('AudioDecoder', () => {
                                     sampleRate: 48000
                                 };
                             }
-
-                            error.mockReset();
                         });
 
-                        if (filterSupportedAudioCodecsForDecoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
-                            it('should not trigger a NotSupportedError', async () => {
-                                audioDecoder.configure(config);
-
-                                expect(error).to.have.not.been.called;
-
-                                await new Promise((resolve) => {
-                                    setTimeout(resolve);
-                                });
-
-                                expect(error).to.have.not.been.called;
+                        describe('with a missing numberOfChannels property', () => {
+                            beforeEach(() => {
+                                delete config.numberOfChannels;
                             });
 
-                            it('should change the state', async () => {
-                                audioDecoder.configure(config);
-
-                                expect(audioDecoder.state).to.equal('configured');
-
-                                await new Promise((resolve) => {
-                                    setTimeout(resolve);
-                                });
-
-                                expect(audioDecoder.state).to.equal('configured');
-                            });
-                        } else {
-                            it('should trigger a NotSupportedError', async () => {
-                                audioDecoder.configure(config);
-
-                                expect(error).to.have.not.been.called;
-
-                                await new Promise((resolve) => {
-                                    // Bug #30: The patch necessary for Safari requires a small delay.
-                                    setTimeout(resolve, 100);
-                                });
-
-                                expect(error).to.have.been.calledOnce;
-
-                                const [args] = error.mock.calls;
-
-                                expect(args.length).to.equal(1);
-
-                                const [err] = args;
-
-                                expect(err.code).to.equal(9);
-                                expect(err.name).to.equal('NotSupportedError');
+                            it('should throw a TypeError', () => {
+                                expect(() => audioDecoder.configure(config)).to.throw(TypeError);
                             });
 
-                            it('should change the state', async () => {
-                                audioDecoder.configure(config);
+                            it('should not change the state', () => {
+                                const fakeError = new Error('This should never be called.');
 
-                                expect(audioDecoder.state).to.equal('configured');
+                                try {
+                                    audioDecoder.configure(config);
 
-                                await new Promise((resolve) => {
-                                    // Bug #30: The patch necessary for Safari requires a small delay.
-                                    setTimeout(resolve, 100);
+                                    throw fakeError;
+                                } catch (err) {
+                                    expect(err).to.not.equal(fakeError);
+
+                                    expect(audioDecoder.state).to.equal('unconfigured');
+                                }
+                            });
+                        });
+
+                        describe('with a numberOfChannels of zero', () => {
+                            beforeEach(() => {
+                                config.numberOfChannels = 0;
+                            });
+
+                            it('should throw a TypeError', () => {
+                                expect(() => audioDecoder.configure(config)).to.throw(TypeError);
+                            });
+
+                            it('should not change the state', () => {
+                                const fakeError = new Error('This should never be called.');
+
+                                try {
+                                    audioDecoder.configure(config);
+
+                                    throw fakeError;
+                                } catch (err) {
+                                    expect(err).to.not.equal(fakeError);
+
+                                    expect(audioDecoder.state).to.equal('unconfigured');
+                                }
+                            });
+                        });
+
+                        describe('with a numberOfChannels below zero', () => {
+                            beforeEach(() => {
+                                config.numberOfChannels = -10;
+                            });
+
+                            it('should throw a TypeError', () => {
+                                expect(() => audioDecoder.configure(config)).to.throw(TypeError);
+                            });
+
+                            it('should not change the state', () => {
+                                const fakeError = new Error('This should never be called.');
+
+                                try {
+                                    audioDecoder.configure(config);
+
+                                    throw fakeError;
+                                } catch (err) {
+                                    expect(err).to.not.equal(fakeError);
+
+                                    expect(audioDecoder.state).to.equal('unconfigured');
+                                }
+                            });
+                        });
+
+                        describe('with a missing sampleRate property', () => {
+                            beforeEach(() => {
+                                delete config.sampleRate;
+                            });
+
+                            it('should throw a TypeError', () => {
+                                expect(() => audioDecoder.configure(config)).to.throw(TypeError);
+                            });
+
+                            it('should not change the state', () => {
+                                const fakeError = new Error('This should never be called.');
+
+                                try {
+                                    audioDecoder.configure(config);
+
+                                    throw fakeError;
+                                } catch (err) {
+                                    expect(err).to.not.equal(fakeError);
+
+                                    expect(audioDecoder.state).to.equal('unconfigured');
+                                }
+                            });
+                        });
+
+                        describe('with a sampleRate of zero', () => {
+                            beforeEach(() => {
+                                config.sampleRate = 0;
+                            });
+
+                            it('should throw a TypeError', () => {
+                                expect(() => audioDecoder.configure(config)).to.throw(TypeError);
+                            });
+
+                            it('should not change the state', () => {
+                                const fakeError = new Error('This should never be called.');
+
+                                try {
+                                    audioDecoder.configure(config);
+
+                                    throw fakeError;
+                                } catch (err) {
+                                    expect(err).to.not.equal(fakeError);
+
+                                    expect(audioDecoder.state).to.equal('unconfigured');
+                                }
+                            });
+                        });
+
+                        describe('with a sampleRate below zero', () => {
+                            beforeEach(() => {
+                                config.sampleRate = -10;
+                            });
+
+                            it('should throw a TypeError', () => {
+                                expect(() => audioDecoder.configure(config)).to.throw(TypeError);
+                            });
+
+                            it('should not change the state', () => {
+                                const fakeError = new Error('This should never be called.');
+
+                                try {
+                                    audioDecoder.configure(config);
+
+                                    throw fakeError;
+                                } catch (err) {
+                                    expect(err).to.not.equal(fakeError);
+
+                                    expect(audioDecoder.state).to.equal('unconfigured');
+                                }
+                            });
+                        });
+
+                        describe('with a valid AudioDecoderConfig', () => {
+                            beforeEach(() => {
+                                error.mockReset();
+                            });
+
+                            if (filterSupportedAudioCodecsForDecoding(KNOWN_AUDIO_CODECS, navigator.userAgent).includes(codec)) {
+                                it('should not trigger a NotSupportedError', async () => {
+                                    audioDecoder.configure(config);
+
+                                    expect(error).to.have.not.been.called;
+
+                                    await new Promise((resolve) => {
+                                        setTimeout(resolve);
+                                    });
+
+                                    expect(error).to.have.not.been.called;
                                 });
 
-                                expect(audioDecoder.state).to.equal('closed');
-                            });
-                        }
+                                it('should change the state', async () => {
+                                    audioDecoder.configure(config);
+
+                                    expect(audioDecoder.state).to.equal('configured');
+
+                                    await new Promise((resolve) => {
+                                        setTimeout(resolve);
+                                    });
+
+                                    expect(audioDecoder.state).to.equal('configured');
+                                });
+                            } else {
+                                it('should trigger a NotSupportedError', async () => {
+                                    audioDecoder.configure(config);
+
+                                    expect(error).to.have.not.been.called;
+
+                                    await new Promise((resolve) => {
+                                        // Bug #30: The patch necessary for Safari requires a small delay.
+                                        setTimeout(resolve, 100);
+                                    });
+
+                                    expect(error).to.have.been.calledOnce;
+
+                                    const [args] = error.mock.calls;
+
+                                    expect(args.length).to.equal(1);
+
+                                    const [err] = args;
+
+                                    expect(err.code).to.equal(9);
+                                    expect(err.name).to.equal('NotSupportedError');
+                                });
+
+                                it('should change the state', async () => {
+                                    audioDecoder.configure(config);
+
+                                    expect(audioDecoder.state).to.equal('configured');
+
+                                    await new Promise((resolve) => {
+                                        // Bug #30: The patch necessary for Safari requires a small delay.
+                                        setTimeout(resolve, 100);
+                                    });
+
+                                    expect(audioDecoder.state).to.equal('closed');
+                                });
+                            }
+                        });
                     });
                 }
             });

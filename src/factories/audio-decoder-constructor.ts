@@ -113,11 +113,11 @@ export const createAudioDecoderConstructor = (
         }
 
         public configure(config: INativeAudioDecoderConfig): void {
-            const { codec } = config;
+            const { codec, numberOfChannels, sampleRate } = config;
 
             if (codec === 'mp3') {
                 this.#promisedMp3DecoderDelaySupportResult = testMp3DecoderDelaySupport();
-            } else if (codec === 'flac') {
+            } else if (codec === 'flac' && numberOfChannels > 0 && sampleRate > 0) {
                 // Bug #30: Safari pretends to support decoding FLAC but then fails when doing so.
                 testFlacDecodingSupport().then((result) => {
                     if (!result) {
