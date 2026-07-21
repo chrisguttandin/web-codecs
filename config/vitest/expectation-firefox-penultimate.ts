@@ -13,7 +13,7 @@ export default defineConfig({
                     headless: true,
                     name: 'Firefox',
                     provider: webdriverio({
-                        capabilities: { 'moz:firefoxOptions': { binary: 'firefox-v150/firefox/Firefox.app/Contents/MacOS/firefox' } }
+                        capabilities: { 'moz:firefoxOptions': { binary: 'firefox-v151/firefox/Firefox.app/Contents/MacOS/firefox' } }
                     })
                 }
             ]
