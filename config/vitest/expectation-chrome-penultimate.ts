@@ -15,8 +15,9 @@ export default defineConfig({
                     provider: webdriverio({
                         capabilities: {
                             'goog:chromeOptions': {
+                                args: ['--disable-features=SymphoniaAudioDecoding'],
                                 // eslint-disable-next-line max-len
-                                binary: 'chrome-v147/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing'
+                                binary: 'chrome-v148/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing'
                             }
                         }
                     })
